@@ -19,7 +19,7 @@ static FIREBASE_ISSUER: &str = "https://securetoken.google.com/dhcircles-fa776";
 
 impl Token {
     pub fn decode(token: &str, keyring: &Keyring) -> Result<Token> {
-        // Decode and desetialize token keader to retrieve "kid"
+        // Decode and deserialize token keader to retrieve "kid"
         let header = token.split(".").nth(0).ok_or(jwt::Error::JWTInvalid)?;
         let header = base64::decode(header)?;
         let header: TokenHeader = json::from_slice(&header[..])?;

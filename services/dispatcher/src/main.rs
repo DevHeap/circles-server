@@ -28,23 +28,44 @@ mod auth;
 mod dispatcher;
 
 use hyper::server::Http;
+use tokio_core::reactor;
+use tokio_core::net::TcpListener;
+use futures::Stream;
 
 use auth::Authenticator;
 use auth::AuthMiddleware;
+
+use std::rc::Rc;
+use std::net::SocketAddr;
 
 fn main() {
     let addr = "0.0.0.0:3247".parse().unwrap();
 
     // Auth state with Google keyring. 
     // Shares the whole application lifetime
-    let auth = Authenticator::new();
+    let auth = Rc::new(Authenticator::new());
 
-    // Here is some borrowck magic with not-so-moving the value
-    // Why it is OK to move the value into an Fn closure? HELL KNOWS.
-    let server = Http::new()
-        .bind(&addr, move || Ok(AuthMiddleware::new(&auth))).unwrap();
-    
     // Unwraps here are ok: if smth goes wrong so badly that we have no error handling,
     // it's either a bug or external failure we have no control upon.
-    server.run().unwrap();
+    
+    // Starting tokio event loop
+    let mut core = reactor::Core::new()
+        .expect("Failed to initialize event loop");
+    let handle = core.handle();
+
+    // Starting TCP server listening for incoming commections
+    let listener = TcpListener::bind(&addr, &handle).unwrap();
+    let server = listener.incoming().for_each(move |(sock, addr)| {
+        // AuthMiddleware is an entry point: it will pass requests to Dispatcher
+        let service_entry = AuthMiddleware::new(auth.clone());
+
+        // Handing TCP connections over to Hyper
+        Http::new().bind_connection(&handle, sock, addr, service_entry);
+        Ok(())
+    });
+
+    // Launching an event loop: unless it is spinned up, nothing happens
+    core.run(server)
+        .expect("Critical server failure");
 }
+

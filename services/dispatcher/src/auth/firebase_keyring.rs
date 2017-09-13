@@ -16,6 +16,9 @@ use auth::{Result, ErrorKind};
 
 static GOOGLE_APIS_SECURE_TOKEN_URI: &str = "https://www.googleapis.com/robot/v1/metadata/x509/securetoken@system.gserviceaccount.com";
 
+// secs
+static KEYRING_RELOAD_REPIOD: u64 = 1200;
+static KEYRING_LOAD_RETRY_PERIOD: u64 = 5;
 
 /// ID;Key pairs from Google API
 /// @NOTE: Google rotates those keys in some period.
@@ -53,7 +56,7 @@ impl Keyring {
     ///        and we could store keys as Pkey objecs to avoid 
     ///        constructing them from PEM for every token authentication  
     pub fn from_json(json: &str) -> Result<Self> {
-        let raw: BTreeMap<KeyID, String> = json::from_str(&json)?;
+        let raw: BTreeMap<KeyID, String> = json::from_str(json)?;
         
         let mut keys = BTreeMap::new();
         for (kid, cert_pem) in raw {
@@ -109,11 +112,11 @@ impl TokenVerifier {
         
         loop {
             // We do not want to update keyring if it was just created
-            // (mainly for testing purpuses) 
+            // (mainly for testing purposes) 
             let need_update = {
                 let keyring = keyring.read().unwrap();
                 match keyring.last_update.elapsed() {
-                    Ok(duration) => duration > Duration::from_secs(1200),
+                    Ok(duration) => duration > Duration::from_secs(KEYRING_RELOAD_REPIOD),
                     Err(error) => {
                         // @TODO logging
                         println!("Error: SystemTime is in the past by {} seconds", error.duration().as_secs());
@@ -146,14 +149,14 @@ impl TokenVerifier {
                     Err(e) => {
                         println!("[AuthMiddleware][TokenVerifier] failed to update google keyring: {}\n", e);
                         // Wait a few seconds and try again
-                        thread::sleep(Duration::from_secs(5));
+                        thread::sleep(Duration::from_secs(KEYRING_LOAD_RETRY_PERIOD));
                         continue;
                     }
                 }
             }
 
             // @TODO check if 20-min timeout between updates is OK
-            thread::sleep(Duration::from_secs(1200));
+            thread::sleep(Duration::from_secs(KEYRING_RELOAD_REPIOD));
         }
     }
 }

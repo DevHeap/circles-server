@@ -4,6 +4,7 @@ use hyper;
 use tokio_service::Service;
 use futures::future;
 use futures::Future;
+use std::rc::Rc;
 
 use auth;
 use auth::Authenticator;
@@ -11,12 +12,12 @@ use auth::error::ErrorKind;
 
 use dispatcher::Dispatcher;
 
-pub struct AuthMiddleware<'a> {
-    auth: &'a Authenticator
+pub struct AuthMiddleware {
+    auth: Rc<Authenticator>
 }   
 
-impl<'a> AuthMiddleware<'a> {
-    pub fn new(auth: &'a Authenticator) -> Self {
+impl AuthMiddleware {
+    pub fn new(auth: Rc<Authenticator>) -> Self {
         AuthMiddleware {
             auth
         }
@@ -24,17 +25,15 @@ impl<'a> AuthMiddleware<'a> {
 
     fn extract_token(req: &Request) -> Result<String, ErrorResponse> {
         let headers = req.headers();
-        let bearer: &Authorization<Bearer> = match headers.get() {
-            Some(bearer) => bearer,
-            None => bail!(ErrorKind::AuthHeaderMissing)
-        };
+        let bearer: &Authorization<Bearer> = headers.get()
+            .ok_or(ErrorResponse::from(ErrorKind::AuthHeaderMissing))?;
 
         // @TODO can we avoid cloning here?
         Ok(bearer.token.clone())
     }
 }
 
-impl<'a> Service for AuthMiddleware<'a> {
+impl Service for AuthMiddleware {
     type Request = Request;
     type Response = Response;
     type Error = hyper::Error;
@@ -53,7 +52,7 @@ impl<'a> Service for AuthMiddleware<'a> {
         };
 
         // Either pass the request to the Dispatcher or return error response to a client
-        let future_token = self.auth.authenticate(token).then(move |auth_result| {
+        let future_response = self.auth.authenticate(token).then(move |auth_result| {
             match auth_result {
                 Ok(token) => {
                     // @TODO logging
@@ -69,7 +68,7 @@ impl<'a> Service for AuthMiddleware<'a> {
             }
         });
 
-        box future_token
+        box future_response
     }
 }
 
@@ -139,9 +138,10 @@ impl From<auth::Error> for ErrorResponse {
     }
 }
 
+// @TODO use serde here
 impl ErrorResponse {
     fn to_json(&self) -> String {
-        format!("{{error:{{status:{},message:{:?}}}}}", 
+        format!("{{\"error\":{{\"status\":{},\"message\":{:?}}}}}", 
         self.status.as_u16(),
         self.message)
     } 
