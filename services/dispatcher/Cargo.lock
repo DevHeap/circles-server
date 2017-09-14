@@ -13,7 +13,7 @@ dependencies = [
  "rdkafka 0.12.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "reqwest 0.7.3 (registry+https://github.com/rust-lang/crates.io-index)",
  "reset-router 0.2.3 (registry+https://github.com/rust-lang/crates.io-index)",
- "rusty_jwt 1.0.0",
+ "rusty_jwt 1.0.0 (git+https://github.com/mersinvald/rusty_jwt)",
  "serde 1.0.11 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde_derive 1.0.11 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde_json 1.0.2 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -674,6 +674,7 @@ dependencies = [
 [[package]]
 name = "rusty_jwt"
 version = "1.0.0"
+source = "git+https://github.com/mersinvald/rusty_jwt#5a9db53633a1ae418577bf5a23e40154519df5f4"
 dependencies = [
  "base64 0.6.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "openssl 0.9.17 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -1130,6 +1131,7 @@ dependencies = [
 "checksum reset-router 0.2.3 (registry+https://github.com/rust-lang/crates.io-index)" = "6d2cedfb77555d850dd40595d800206b27f0530f6bb5adb2ab3d2cca088510a2"
 "checksum rustc-demangle 0.1.5 (registry+https://github.com/rust-lang/crates.io-index)" = "aee45432acc62f7b9a108cc054142dac51f979e69e71ddce7d6fc7adf29e817e"
 "checksum rustc_version 0.1.7 (registry+https://github.com/rust-lang/crates.io-index)" = "c5f5376ea5e30ce23c03eb77cbe4962b988deead10910c372b226388b594c084"
+"checksum rusty_jwt 1.0.0 (git+https://github.com/mersinvald/rusty_jwt)" = "<none>"
 "checksum safemem 0.2.0 (registry+https://github.com/rust-lang/crates.io-index)" = "e27a8b19b835f7aea908818e871f5cc3a5a186550c30773be987e155e8163d8f"
 "checksum schannel 0.1.7 (registry+https://github.com/rust-lang/crates.io-index)" = "14a5f8491ae5fc8c51aded1f5806282a0218b4d69b1b76913a0559507e559b90"
 "checksum scoped-tls 0.1.0 (registry+https://github.com/rust-lang/crates.io-index)" = "f417c22df063e9450888a7561788e9bd46d3bb3c1466435b4eccb903807f147d"

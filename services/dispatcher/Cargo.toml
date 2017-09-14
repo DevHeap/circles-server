@@ -22,5 +22,5 @@ openssl = "^0.9"
 reqwest = "^0.7"
 
 [dependencies.rusty_jwt]
-path = "../../../rusty_jwt"
+git = "https://github.com/mersinvald/rusty_jwt"
 #rev = "deee07b"
