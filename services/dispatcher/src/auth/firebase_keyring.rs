@@ -107,8 +107,7 @@ impl TokenVerifier {
     }
 
     fn keyring_update_task(keyring: Arc<RwLock<Keyring>>) {
-        // @TODO logging
-        println!("[AuthMiddleware][TokenVerifier] starting up keys updater thread");
+        info!("Starting up keys updater thread");
         
         loop {
             // We do not want to update keyring if it was just created
@@ -118,8 +117,7 @@ impl TokenVerifier {
                 match keyring.last_update.elapsed() {
                     Ok(duration) => duration > Duration::from_secs(KEYRING_RELOAD_REPIOD),
                     Err(error) => {
-                        // @TODO logging
-                        println!("Error: SystemTime is in the past by {} seconds", error.duration().as_secs());
+                        warn!("SystemTime is in the past by {} seconds", error.duration().as_secs());
                         true    
                     }  
                 }
@@ -143,11 +141,10 @@ impl TokenVerifier {
                     Ok(())
                 };
 
-                // @TODO logging
                 match updated() {
-                    Ok(_) => println!("[AuthMiddleware][TokenVerifier] updated google keyring"),
+                    Ok(_) => info!("Updated google keyring"),
                     Err(e) => {
-                        println!("[AuthMiddleware][TokenVerifier] failed to update google keyring: {}\n", e);
+                        error!("Failed to update google keyring: {}\n", e);
                         // Wait a few seconds and try again
                         thread::sleep(Duration::from_secs(KEYRING_LOAD_RETRY_PERIOD));
                         continue;

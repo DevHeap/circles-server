@@ -24,6 +24,10 @@ extern crate error_chain;
 #[macro_use]
 extern crate lazy_static;
 
+#[macro_use]
+extern crate log;
+extern crate fern;
+
 mod auth;
 mod dispatcher;
 
@@ -38,19 +42,37 @@ use auth::AuthMiddleware;
 use std::rc::Rc;
 use std::net::SocketAddr;
 
+fn init_logger() -> Result<(), log::SetLoggerError> {
+    fern::Dispatch::new()
+        .format(|out, message, record| {
+            out.finish(format_args!(
+                "{}[{}][{}] {}",
+                chrono::Local::now().format("[%Y-%m-%d][%H:%M:%S]"),
+                record.target(),
+                record.level(),
+                message
+            ))
+        })
+        .level(log::LogLevelFilter::Warn)
+        .level_for("dispatcher", log::LogLevelFilter::Trace)
+        .chain(std::io::stdout())
+        .apply()?;
+    Ok(())
+}
+
 fn main() {
+    init_logger().unwrap();
     let addr = "0.0.0.0:3247".parse().unwrap();
 
-    // Auth state with Google keyring. 
+    // Auth state with Google keyring.
     // Shares the whole application lifetime
     let auth = Rc::new(Authenticator::new());
 
     // Unwraps here are ok: if smth goes wrong so badly that we have no error handling,
     // it's either a bug or external failure we have no control upon.
-    
+
     // Starting tokio event loop
-    let mut core = reactor::Core::new()
-        .expect("Failed to initialize event loop");
+    let mut core = reactor::Core::new().expect("Failed to initialize event loop");
     let handle = core.handle();
 
     // Starting TCP server listening for incoming commections
@@ -65,7 +87,6 @@ fn main() {
     });
 
     // Launching an event loop: unless it is spinned up, nothing happens
-    core.run(server)
-        .expect("Critical server failure");
+    core.run(server).expect("Critical server failure");
 }
-
+                    info!("Attempted unathorized access to {}", uri);

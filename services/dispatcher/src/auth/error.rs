@@ -17,7 +17,7 @@ error_chain! {
 
     errors {
         FailedToRetrieveKeyring(status: StatusCode) {
-            description("failed to retrive google keyring")
+            description("failed to retrieve google keyring")
             display("failed to retrieve google keyring: {}", status)
         }
 
