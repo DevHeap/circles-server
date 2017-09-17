@@ -14,9 +14,6 @@ pub struct Token {
     idtoken: IDToken
 }
 
-static FIREBASE_AUDIENCE: &str = "dhcircles-fa776";
-static FIREBASE_ISSUER: &str = "https://securetoken.google.com/dhcircles-fa776";
-
 impl Token {
     pub fn decode(token: &str, keyring: &Keyring) -> Result<Token> {
         // Decode and deserialize token keader to retrieve "kid"
@@ -24,16 +21,8 @@ impl Token {
         let header = base64::decode(header)?;
         let header: TokenHeader = json::from_slice(&header[..])?;
 
-        // Get a Public Key with received "kid" from Google Keyring
-        let public_key = keyring.get(&header.kid).ok_or(ErrorKind::UnknownKeyID)?;
-
-        // Construct a decoder that will decode token,
-        // verify signature and ISSUES + AUDIENCE
-        let decoder = IDTokenDecoder::from_pem(
-            public_key,
-            FIREBASE_ISSUER,
-            FIREBASE_AUDIENCE
-        )?;
+        // Get a Decoder for received "kid" from Google Keyring
+        let decoder = keyring.get(&header.kid).ok_or(ErrorKind::UnknownKeyID)?;
 
         // Construct Self object wrapping a decoded idtoken
         let token = Token {

@@ -49,7 +49,6 @@ impl Service for Router {
             let user = req.headers().get::<UserID>();
             let message = format!("User {:?}: accepted {} request for {}", user, method, path);
         
-            // @TODO logging
             debug!("{}", message);
 
             let handler = match self.routes.get(path) {

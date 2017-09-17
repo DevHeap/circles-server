@@ -13,6 +13,7 @@ use reqwest;
 use reqwest::StatusCode;
 use firebase::Token;
 use firebase::{Result, Error, ErrorKind};
+use jwt::id_token::IDTokenDecoder;
 
 static GOOGLE_APIS_SECURE_TOKEN_URI: &str = "https://www.googleapis.com/robot/v1/metadata/x509/securetoken@system.gserviceaccount.com";
 
@@ -20,17 +21,20 @@ static GOOGLE_APIS_SECURE_TOKEN_URI: &str = "https://www.googleapis.com/robot/v1
 static KEYRING_RELOAD_REPIOD: u64 = 1200;
 static KEYRING_LOAD_RETRY_PERIOD: u64 = 5;
 
+static FIREBASE_AUDIENCE: &str = "dhcircles-fa776";
+static FIREBASE_ISSUER: &str = "https://securetoken.google.com/dhcircles-fa776";
+
 /// ID;Key pairs from Google API
 /// @NOTE: Google rotates those keys in some period.
 ///        Need to check if this can cause any pain in the ass with clients authorized before rotation
 ///        Then, solution might be to store 2 keyrings: current and previous one
 pub struct Keyring {
-    keys: BTreeMap<KeyID, Key>,
+    keys: BTreeMap<KeyID, Decoder>,
     last_update: SystemTime,
 }
 
 pub type KeyID = String;
-pub type Key = Vec<u8>;
+pub type Decoder = IDTokenDecoder;
 
 impl Keyring {
     /// Constructs an empty Keyring
@@ -42,7 +46,7 @@ impl Keyring {
     } 
 
     /// Constructs a keyring from a kid:pkey map
-    pub fn with_keys(keys: BTreeMap<KeyID, Key>) -> Self {
+    pub fn with_keys(keys: BTreeMap<KeyID, Decoder>) -> Self {
         Keyring {
             keys,
             last_update: SystemTime::now()
@@ -50,11 +54,7 @@ impl Keyring {
     }  
 
     /// Constructs a keyring from JSON with kid:cert pairs from Google
-    /// Converts certs to public keys in PEM format
-    ///
-    /// @TODO: patch rusty_jwt so it won't take ownership over a PKey,
-    ///        and we could store keys as Pkey objecs to avoid 
-    ///        constructing them from PEM for every token authentication  
+    /// Converts certs to public keys and created an IDTokenDecoders
     pub fn from_json(json: &str) -> Result<Self> {
         let raw: BTreeMap<KeyID, String> = json::from_str(json)?;
         
@@ -63,14 +63,18 @@ impl Keyring {
             let cert_pem = cert_pem.replace("\\n", "\n");
             let x509 = X509::from_pem(cert_pem.as_bytes())?;
             let pkey = x509.public_key()?;
-            let pem = pkey.public_key_to_pem()?;
-            keys.insert(kid, pem);
+            let decoder = IDTokenDecoder::from_key(
+                pkey,
+                FIREBASE_ISSUER,
+                FIREBASE_AUDIENCE
+            );
+            keys.insert(kid, decoder);
         }
 
         Ok(Keyring::with_keys(keys))
     }
 
-    pub fn get(&self, kid: &str) -> Option<&Key> {
+    pub fn get(&self, kid: &str) -> Option<&Decoder> {
         self.keys.get(kid)
     }
 }
