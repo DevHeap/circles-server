@@ -42,8 +42,7 @@ impl Service for AuthMiddleware {
     fn call(&self, req: Request) -> Self::Future {
         let uri = req.uri().clone();
 
-        // @TODO logging
-        println!("[AuthMiddleware] accepted {} request for {}", req.method(), req.uri());
+        info!("Accepted {} request for {}", req.method(), req.uri());
 
         // Extract IDToken from headers
         let token = match Self::extract_token(&req) {
@@ -55,14 +54,12 @@ impl Service for AuthMiddleware {
         let future_response = self.auth.authenticate(token).then(move |auth_result| {
             match auth_result {
                 Ok(token) => {
-                    // @TODO logging
-                    println!("[AuthMiddleware] authorized request from user {}", token.user_id());
+                    info!("Authorized request from user {}", token.user_id());
                     let dispatcher = Dispatcher::new(token);
                     dispatcher.call(req)
                 },
                 Err(err) => {
-                    // @TODO logging
-                    println!("[AuthMiddleware] attempted unathorized access to {}", uri);
+                    info!("Attempted unathorized access to {}", uri);
                     box future::ok(ErrorResponse::from(err).into())
                 }
             }

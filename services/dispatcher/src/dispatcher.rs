@@ -27,10 +27,9 @@ impl Service for Dispatcher {
         let uri = req.uri();
         let method = req.method();
         let user = self.token.user_id();
-        let message = format!("[Dispatcher] User {}: accepted {} request for {}", user, method, uri);
+        let message = format!("User {}: accepted {} request for {}", user, method, uri);
         
-        // @TODO logging
-        println!("{}", message);
+        info!("{}", message);
 
         let resp = Response::new()
             .with_status(StatusCode::Ok)
