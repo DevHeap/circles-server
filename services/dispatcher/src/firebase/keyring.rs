@@ -11,8 +11,8 @@ use json;
 
 use reqwest;
 use reqwest::StatusCode;
-use auth::Token;
-use auth::{Result, ErrorKind};
+use firebase::Token;
+use firebase::{Result, Error, ErrorKind};
 
 static GOOGLE_APIS_SECURE_TOKEN_URI: &str = "https://www.googleapis.com/robot/v1/metadata/x509/securetoken@system.gserviceaccount.com";
 
@@ -155,5 +155,29 @@ impl TokenVerifier {
             // @TODO check if 20-min timeout between updates is OK
             thread::sleep(Duration::from_secs(KEYRING_RELOAD_REPIOD));
         }
+    }
+}
+
+use futures_cpupool::CpuPool;
+use futures::Future;
+
+/// CpuPool driven token authentifier
+pub struct AsyncTokenVerifier {
+    cpupool: CpuPool,
+    verifier: Arc<TokenVerifier>,
+}
+
+impl AsyncTokenVerifier {
+    pub fn new() -> Self {
+        AsyncTokenVerifier {
+            cpupool: CpuPool::new_num_cpus(),
+            verifier: Arc::new(TokenVerifier::new()),
+        }
+    }
+
+    /// Asynchronously Verify JWT Token
+    pub fn authenticate(&self, token: String) -> impl Future<Item=Token, Error=Error> {
+        let verifier = self.verifier.clone();
+        self.cpupool.spawn_fn(move || verifier.verify_token(token))
     }
 }

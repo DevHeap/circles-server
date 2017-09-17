@@ -21,11 +21,6 @@ error_chain! {
             display("failed to retrieve google keyring: {}", status)
         }
 
-        AuthHeaderMissing {
-            description("missing Authorization header")
-            display("missing Authorization header")
-        }
-        
         EmptyUserID {
             description("userid is empty")
             display("userid is empty")

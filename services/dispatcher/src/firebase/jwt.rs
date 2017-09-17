@@ -5,8 +5,8 @@ use jwt::id_token::{IDToken, IDTokenDecoder};
 use base64;
 use json;
 
-use auth::firebase_keyring::Keyring;
-use auth::{Result, ErrorKind};
+use firebase::keyring::Keyring;
+use firebase::{Result, ErrorKind};
 
 use std::ops::Deref;
 
