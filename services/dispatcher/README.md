@@ -2,10 +2,10 @@
 
 Unathorized token:
 ```
-Requests/sec:  26398.35
+Requests/sec:  35968.79
 ```
 
 Valid Token
 ```
-Requests/sec:  27097.63
+Requests/sec:  36619.10
 ```
