@@ -21,7 +21,11 @@ base64 = "^0.6"
 openssl = "^0.9"
 reqwest = "^0.7"
 log = "0.3"
-fern = "0.4"
+
+[dependencies.fern]
+git = "https://github.com/gingerDevilish/fern"
+branch = "sender-output"
+
 
 [dependencies.rusty_jwt]
 git = "https://github.com/mersinvald/rusty_jwt"

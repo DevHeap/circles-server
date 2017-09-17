@@ -41,8 +41,17 @@ use auth::AuthMiddleware;
 
 use std::rc::Rc;
 use std::net::SocketAddr;
+use std::thread;
+use std::sync::mpsc::channel;
 
 fn init_logger() -> Result<(), log::SetLoggerError> {
+    let (tx, rx) = channel();
+    thread::spawn(move || {
+        while let Ok(msg) = rx.recv() {
+            print!("{}", msg);
+        }
+    });
+
     fern::Dispatch::new()
         .format(|out, message, record| {
             out.finish(format_args!(
@@ -55,7 +64,7 @@ fn init_logger() -> Result<(), log::SetLoggerError> {
         })
         .level(log::LogLevelFilter::Warn)
         .level_for("dispatcher", log::LogLevelFilter::Trace)
-        .chain(std::io::stdout())
+        .chain(tx)
         .apply()?;
     Ok(())
 }
@@ -89,4 +98,4 @@ fn main() {
     // Launching an event loop: unless it is spinned up, nothing happens
     core.run(server).expect("Critical server failure");
 }
-                    info!("Attempted unathorized access to {}", uri);
+
