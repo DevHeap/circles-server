@@ -4,6 +4,7 @@
 extern crate rdkafka;
 extern crate tokio_core;
 extern crate tokio_service;
+extern crate service_fn;
 extern crate futures;
 extern crate futures_cpupool;
 extern crate hyper;
@@ -28,19 +29,20 @@ extern crate lazy_static;
 extern crate log;
 extern crate fern;
 
-mod auth;
-mod dispatcher;
+mod firebase;
+mod middleware;
 
 use hyper::server::Http;
 use tokio_core::reactor;
 use tokio_core::net::TcpListener;
 use futures::Stream;
 
-use auth::Authenticator;
-use auth::AuthMiddleware;
+use firebase::AsyncTokenVerifier;
+
+use middleware::Authenticator;
+use middleware::Router;
 
 use std::rc::Rc;
-use std::net::SocketAddr;
 use std::thread;
 use std::sync::mpsc::channel;
 
@@ -63,7 +65,7 @@ fn init_logger() -> Result<(), log::SetLoggerError> {
             ))
         })
         .level(log::LogLevelFilter::Warn)
-        .level_for("dispatcher", log::LogLevelFilter::Trace)
+        .level_for("dispatcher", log::LogLevelFilter::Info)
         .chain(tx)
         .apply()?;
     Ok(())
@@ -75,7 +77,10 @@ fn main() {
 
     // Auth state with Google keyring.
     // Shares the whole application lifetime
-    let auth = Rc::new(Authenticator::new());
+    let verifier = Rc::new(AsyncTokenVerifier::new());
+
+    // Router to dispatch requests for concrete pathes to their handlers 
+    let router = Rc::new(setup_router());
 
     // Unwraps here are ok: if smth goes wrong so badly that we have no error handling,
     // it's either a bug or external failure we have no control upon.
@@ -88,7 +93,8 @@ fn main() {
     let listener = TcpListener::bind(&addr, &handle).unwrap();
     let server = listener.incoming().for_each(move |(sock, addr)| {
         // AuthMiddleware is an entry point: it will pass requests to Dispatcher
-        let service_entry = AuthMiddleware::new(auth.clone());
+        let service_entry = Authenticator::new(verifier.clone(), 
+                                               router.clone());
 
         // Handing TCP connections over to Hyper
         Http::new().bind_connection(&handle, sock, addr, service_entry);
@@ -99,3 +105,22 @@ fn main() {
     core.run(server).expect("Critical server failure");
 }
 
+use service_fn::service_fn;
+use middleware::header::UserID;
+use hyper::server::Request;
+use hyper::server::Response;
+use futures::future;
+use middleware::router::FutureRoute;
+
+fn setup_router() -> Router {
+    let mut router = Router::new();
+
+    router.add_route("/", box service_fn(|req: Request| -> FutureRoute {
+        let uid = req.headers().get::<UserID>().unwrap();
+        let met = req.method();
+        trace!("Accepted request {} to / from {:?}", met, uid);
+        box future::ok(Response::new())
+    }));
+
+    router
+}

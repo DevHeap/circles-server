@@ -30,3 +30,6 @@ branch = "sender-output"
 [dependencies.rusty_jwt]
 git = "https://github.com/mersinvald/rusty_jwt"
 #rev = "deee07b"
+
+[dependencies.service-fn]
+git = "https://github.com/tokio-rs/service-fn"
