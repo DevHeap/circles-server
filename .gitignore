@@ -1,1 +1,3 @@
 **/target/
+graylog/config/node-id
+graylog/data
