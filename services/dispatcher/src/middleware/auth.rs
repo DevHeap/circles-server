@@ -8,12 +8,14 @@ use std::rc::Rc;
 
 use firebase::Token;
 use firebase::AsyncTokenVerifier;
-use middleware::ErrorKind;
-use middleware;
 
-use middleware::Router;
-use middleware::error::ErrorResponse;
-use middleware::header::UserID;
+use circles_router::router::Router;
+use hyper::server::NewService;
+use hyper_common::header::UserID;
+use hyper_common::ErrorResponse;
+
+use middleware::error::ErrorKind as MwErrorKind;
+use middleware::error::Result as MwResult;
 
 pub struct Authenticator {
     auth: Rc<AsyncTokenVerifier>,
@@ -31,7 +33,7 @@ impl Authenticator {
     fn extract_token(req: &Request) -> Result<String, ErrorResponse> {
         let headers = req.headers();
         let bearer: &Authorization<Bearer> = headers.get()
-            .ok_or(ErrorResponse::from(ErrorKind::AuthHeaderMissing))?;
+            .ok_or(ErrorResponse::from(MwErrorKind::AuthHeaderMissing))?;
 
         // @TODO can we avoid cloning here?
         Ok(bearer.token.clone())
@@ -55,11 +57,13 @@ impl Service for Authenticator {
             Err(error) => return box future::ok(error.into())
         };
 
-        let router = self.router.clone();
+        let router = self.router.new_service()
+        // Can never happen. Really.
+            .unwrap(); 
 
         // Either pass the request to the Dispatcher or return error response to a client
         let future_response = self.auth.authenticate(token).map_err(|e| e.into())
-                                       .then(move |auth_result: middleware::Result<Token>| {
+                                       .then(move |auth_result: MwResult<Token>| {
             match auth_result {
                 Ok(token) => {
                     debug!("authorized request from user {}", token.user_id());

@@ -5,6 +5,7 @@ use std::fmt;
 use std::str;
 use std::ops::Deref;
 
+/// Header to pass ID of an authorized user throughout our services
 #[derive(Debug, Clone, Eq, PartialEq)]
 pub struct UserID(pub String);
 
@@ -18,7 +19,7 @@ impl Header for UserID {
         let raw_header = str::from_utf8(&raw_header)?;
         Ok(UserID(raw_header.to_owned()))
     }
-    
+
     fn fmt_header(&self, f: &mut hyper::header::Formatter) -> fmt::Result {
         f.fmt_line(&self.0)
     }

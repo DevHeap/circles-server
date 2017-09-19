@@ -1,7 +1,7 @@
 /// @TODO: tests
 
 use jwt;
-use jwt::id_token::{IDToken, IDTokenDecoder};
+use jwt::id_token::IDToken;
 use base64;
 use json;
 
