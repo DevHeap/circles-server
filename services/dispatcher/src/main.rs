@@ -29,6 +29,9 @@ extern crate lazy_static;
 extern crate log;
 extern crate fern;
 
+extern crate circles_router;
+extern crate hyper_common;
+
 mod firebase;
 mod middleware;
 
@@ -40,7 +43,8 @@ use futures::Stream;
 use firebase::AsyncTokenVerifier;
 
 use middleware::Authenticator;
-use middleware::Router;
+use circles_router::RouterBuilder;
+use circles_router::router::Router;
 
 use std::rc::Rc;
 use std::thread;
@@ -106,21 +110,21 @@ fn main() {
 }
 
 use service_fn::service_fn;
-use middleware::header::UserID;
 use hyper::server::Request;
 use hyper::server::Response;
 use futures::future;
-use middleware::router::FutureRoute;
+use hyper_common::header::UserID;
+use circles_router::FutureRoute;
 
+// Setup routes and handlers
 fn setup_router() -> Router {
-    let mut router = Router::new();
-
-    router.add_route("/", box service_fn(|req: Request| -> FutureRoute {
-        let uid = req.headers().get::<UserID>().unwrap();
-        let met = req.method();
-        trace!("Accepted request {} to / from {:?}", met, uid);
-        box future::ok(Response::new())
-    }));
-
-    router
+    // A dummy handler for `/`
+    RouterBuilder::new()
+        .add_route("/", box service_fn(|req: Request| -> FutureRoute {
+            let uid = req.headers().get::<UserID>().unwrap();
+            let met = req.method();
+            trace!("Accepted request {} to / from {:?}", met, uid);
+            box future::ok(Response::new())
+        }))
+        .build()
 }
