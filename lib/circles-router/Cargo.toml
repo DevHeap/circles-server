@@ -10,7 +10,7 @@ error-chain = "^0.10"
 log = "0.3"
 
 [dependencies.hyper]
-git = "https://github.com/mersinvald/hyper"
+git = "https://github.com/DevHeap/hyper"
 
 [dependencies.hyper-common]
 path = "../hyper-common"
