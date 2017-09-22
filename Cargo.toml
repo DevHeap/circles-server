@@ -1,0 +1,7 @@
+[workspace]
+members = [
+    "lib/circles-router/",
+    "lib/hyper-common/",
+    "services/dispatcher",
+    "lib/circles-common"
+]

@@ -1,5 +1,4 @@
 #![feature(box_syntax)]
-#![allow(unused_doc_comment)]
 
 ///! Router for Hyper Services
 

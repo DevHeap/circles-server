@@ -4,4 +4,4 @@ version = "0.1.0"
 authors = ["Mike Lubinets <lubinetsm@yandex.ru>"]
 
 [dependencies.hyper]
-git = "https://github.com/mersinvald/hyper"
+git = "https://github.com/DevHeap/hyper"

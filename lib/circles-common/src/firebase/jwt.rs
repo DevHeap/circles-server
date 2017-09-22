@@ -10,6 +10,7 @@ use firebase::{Result, ErrorKind};
 
 use std::ops::Deref;
 
+/// Google Firebase Token
 pub struct Token {
     idtoken: IDToken
 }
