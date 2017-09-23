@@ -6,7 +6,6 @@ extern crate diesel_codegen;
 extern crate diesel;
 #[macro_use]
 extern crate serde_derive;
-extern crate serde;
 extern crate chrono;
 extern crate r2d2;
 extern crate r2d2_diesel;
