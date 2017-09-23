@@ -26,10 +26,6 @@ git = "https://github.com/DevHeap/hyper"
 [dependencies.reqwest]
 git = "https://github.com/DevHeap/reqwest"
 
-[dependencies.fern]
-git = "https://github.com/gingerDevilish/fern"
-branch = "sender-output"
-
 [dependencies.rusty_jwt]
 git = "https://github.com/DevHeap/rusty_jwt"
 

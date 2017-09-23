@@ -119,7 +119,6 @@ dependencies = [
  "diesel_codegen 0.16.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "dotenv 0.10.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "error-chain 0.10.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "fern 0.4.3-dev (git+https://github.com/gingerDevilish/fern?branch=sender-output)",
  "futures 0.1.16 (registry+https://github.com/rust-lang/crates.io-index)",
  "futures-cpupool 0.1.6 (registry+https://github.com/rust-lang/crates.io-index)",
  "hyper 0.11.2 (git+https://github.com/DevHeap/hyper)",
@@ -246,13 +245,11 @@ dependencies = [
  "circles-router 0.1.0",
  "diesel 0.16.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "error-chain 0.10.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "fern 0.4.3-dev (git+https://github.com/gingerDevilish/fern?branch=sender-output)",
+ "fern 0.4.3 (registry+https://github.com/rust-lang/crates.io-index)",
  "futures 0.1.16 (registry+https://github.com/rust-lang/crates.io-index)",
  "hyper 0.11.2 (git+https://github.com/DevHeap/hyper)",
  "hyper-common 0.1.0",
  "log 0.3.8 (registry+https://github.com/rust-lang/crates.io-index)",
- "reqwest 0.7.3 (git+https://github.com/DevHeap/reqwest)",
- "rusty_jwt 1.0.0 (git+https://github.com/DevHeap/rusty_jwt)",
  "service-fn 0.1.0 (git+https://github.com/tokio-rs/service-fn)",
  "tokio-core 0.1.9 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
@@ -282,8 +279,8 @@ dependencies = [
 
 [[package]]
 name = "fern"
-version = "0.4.3-dev"
-source = "git+https://github.com/gingerDevilish/fern?branch=sender-output#159d2a18c918677900bfc7c6a2317843711bb019"
+version = "0.4.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
  "log 0.3.8 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
@@ -1136,7 +1133,7 @@ dependencies = [
 "checksum dotenv 0.10.1 (registry+https://github.com/rust-lang/crates.io-index)" = "d6f0e2bb24d163428d8031d3ebd2d2bd903ad933205a97d0f18c7c1aade380f3"
 "checksum dtoa 0.4.2 (registry+https://github.com/rust-lang/crates.io-index)" = "09c3753c3db574d215cba4ea76018483895d7bff25a31b49ba45db21c48e50ab"
 "checksum error-chain 0.10.0 (registry+https://github.com/rust-lang/crates.io-index)" = "d9435d864e017c3c6afeac1654189b06cdb491cf2ff73dbf0d73b0f292f42ff8"
-"checksum fern 0.4.3-dev (git+https://github.com/gingerDevilish/fern?branch=sender-output)" = "<none>"
+"checksum fern 0.4.3 (registry+https://github.com/rust-lang/crates.io-index)" = "1f0297637852905c7ce4cefd8d8a6719f6e3cfb22e2e9f0aa0650f4804a6f360"
 "checksum foreign-types 0.2.0 (registry+https://github.com/rust-lang/crates.io-index)" = "3e4056b9bd47f8ac5ba12be771f77a0dae796d1bbaaf5fd0b9c2d38b69b8a29d"
 "checksum futures 0.1.16 (registry+https://github.com/rust-lang/crates.io-index)" = "05a23db7bd162d4e8265968602930c476f688f0c180b44bdaf55e0cb2c687558"
 "checksum futures-cpupool 0.1.6 (registry+https://github.com/rust-lang/crates.io-index)" = "77d49e7de8b91b20d6fda43eea906637eff18b96702eb6b2872df8bfab1ad2b5"
