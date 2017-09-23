@@ -9,20 +9,10 @@ futures = "^0.1"
 error-chain = "^0.10"
 chrono = "^0.4"
 log = "0.3"
-diesel = { version = "^0.16", features = ["postgres"] }
-
-[dependencies.hyper]
-git = "https://github.com/DevHeap/hyper"
-
-[dependencies.reqwest]
-git = "https://github.com/DevHeap/reqwest"
-
-[dependencies.fern]
-git = "https://github.com/gingerDevilish/fern"
-branch = "sender-output"
+fern = "^0.4"
 
 [dependencies.rusty_jwt]
-git = "https://github.com/DevHeap/rusty_jwt"
+git = "https://github.com/mersinvald/rusty_jwt"
 
 [dependencies.service-fn]
 git = "https://github.com/tokio-rs/service-fn"
