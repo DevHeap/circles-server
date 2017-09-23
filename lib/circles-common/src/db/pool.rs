@@ -46,7 +46,7 @@ impl AsyncPgPool {
     
     /// Execute a request with pooled connection from AsyncPgPool.
     /// Returns the future with a query result
-    pub fn request<F, R, E>(&self, closure: F) -> CpuFuture<R::Item, Error>
+    pub fn request<F, R>(&self, closure: F) -> CpuFuture<R::Item, Error>
         where F: FnOnce(PgPooledConnection) -> R + Send + 'static,
               R: IntoFuture<Error=Error> + 'static,
               R::Future: Send + 'static,

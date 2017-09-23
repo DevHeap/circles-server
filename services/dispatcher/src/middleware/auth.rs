@@ -180,7 +180,7 @@ impl UsersDbUpdater {
         debug!("started updating users db table for {}", token.user_id());
 
         // Insert an authentified user or, if user exists, just update 
-        let db_future = self.db.request::<_,_,Error>(move |conn| {
+        let db_future = self.db.request(move |conn| {
             result(
                 insert(
                     &user.on_conflict(uid, do_update().set(&user.auth_data()))
