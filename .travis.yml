@@ -3,8 +3,5 @@ sudo: false
 language: rust
 cache: cargo
 
-before_install:
- - cd services/dispatcher
-
 rust:
   - nightly
