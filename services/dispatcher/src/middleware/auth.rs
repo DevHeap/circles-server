@@ -193,10 +193,10 @@ impl UsersDbUpdater {
         db_future.map_err(MwError::from)
             .then(move |result| {
                 match result {
-                    Ok(rows) => debug!("successfully updated {} rows for user {}", rows, user_id),
-                    Err(e)   => error!("failed to update db for user {}: {}", user_id, e)
+                    Ok(ref rows) => debug!("successfully updated {} rows for user {}", rows, user_id),
+                    Err(ref e)   => error!("failed to update db for user {}: {}", user_id, e)
                 }
-                Ok(())
+                result.map(|_|())
             })
     }
 }
