@@ -59,11 +59,11 @@ fn init_logger() -> Result<(), log::SetLoggerError> {
             ))
         })
         .level(log::LogLevelFilter::Warn)
-      /*  .level_for("dispatcher",     log::LogLevelFilter::Trace)
+        .level_for("dispatcher",     log::LogLevelFilter::Trace)
         .level_for("circles_router", log::LogLevelFilter::Trace)
         .level_for("circles_common", log::LogLevelFilter::Trace)
         .level_for("hyper_common",   log::LogLevelFilter::Trace)
-      */  .chain(tx)
+        .chain(tx)
         .apply()?;
     Ok(())
 }
