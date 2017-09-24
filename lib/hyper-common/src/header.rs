@@ -1,5 +1,7 @@
+#![allow(unused_doc_comment)]
 use hyper::header::Header;
 use hyper::header::Raw;
+use hyper::StatusCode;
 use hyper;
 use std::fmt;
 use std::str;
@@ -29,6 +31,35 @@ impl Deref for UserID {
     type Target = str;
     fn deref(&self) -> &Self::Target {
         &self.0
+    }
+}
+
+error_chain! {
+    errors {
+        MissingUserIDHeader {
+            description("missing UserID header")
+            display("missing UserID header")
+        }
+    }
+}
+
+use error_response::ErrorResponse;
+
+impl From<Error> for ErrorResponse {
+    fn from(e: Error) -> Self {
+        Self::from(e.kind())
+    }
+}
+
+impl From<ErrorKind> for ErrorResponse {
+    fn from(ek: ErrorKind) -> Self {
+        Self::from(&ek)
+    }
+}
+
+impl<'a> From<&'a ErrorKind> for ErrorResponse {
+    fn from(ek: &'a ErrorKind) -> Self {
+        Self::with_status(ek, StatusCode::InternalServerError)
     }
 }
 
