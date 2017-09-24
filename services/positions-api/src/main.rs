@@ -27,6 +27,7 @@ use tokio_core::net::TcpListener;
 use futures::Stream;
 
 use circles_common::db::AsyncPgPool;
+use circles_common::http::Authenticator;
 
 use std::rc::Rc;
 use std::thread;
@@ -52,10 +53,10 @@ fn init_logger() -> Result<(), log::SetLoggerError> {
             ))
         })
         .level(log::LogLevelFilter::Warn)
-        /*.level_for("positions-api",  log::LogLevelFilter::Trace)
+        .level_for("positions-api",  log::LogLevelFilter::Trace)
         .level_for("circles_router", log::LogLevelFilter::Trace)
         .level_for("circles_common", log::LogLevelFilter::Trace)
-        .level_for("hyper_common",   log::LogLevelFilter::Trace)*/
+        .level_for("hyper_common",   log::LogLevelFilter::Trace)
         .chain(tx)
         .apply()?;
     Ok(())
@@ -78,13 +79,19 @@ fn main() {
 
     // Router to dispatch requests for concrete pathes to their handlers 
     let router = router!(
-        post_positions: Method::Post, "/positions" => Rc::new(PositionsPostHandler::new(pgpool)),
+        post_positions: Method::Post, "/positions" => Rc::new(PositionsPostHandler::new(pgpool.clone())),
+    );
+
+    // Authenticator for firebase token verification and user info popullation in the database
+    let authenticator = Authenticator::new(
+        pgpool.clone(),
+        Rc::new(router)
     );
 
     // Starting TCP server listening for incoming commections
     let listener = TcpListener::bind(&addr, &handle).unwrap();
     let server = listener.incoming().for_each(move |(sock, addr)| {
-        let entry_service = router.new_service()
+        let entry_service = authenticator.new_service()
         // Can never happen
             .unwrap();
 
