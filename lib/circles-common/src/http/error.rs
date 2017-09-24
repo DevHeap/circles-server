@@ -33,12 +33,18 @@ error_chain!{
 impl From<Error> for ErrorResponse {
     fn from(e: Error) -> Self {
         match *e.kind() {
-            ErrorKind::Firebase(ref e)     => ErrorResponse::from(e),
-            ErrorKind::Database(ref e)     => ErrorResponse::with_status(&e, StatusCode::InternalServerError),
-            ErrorKind::AuthHeaderMissing   => ErrorResponse::with_status(&e, StatusCode::Unauthorized),
-            ErrorKind::PathNotFound(..)    => ErrorResponse::with_status(&e, StatusCode::NotFound),
-            ErrorKind::MissingUserIDHeader => ErrorResponse::with_status(&e, StatusCode::InternalServerError),
-            ErrorKind::Msg(..)             => ErrorResponse::with_status(&e, StatusCode::InternalServerError)
+            ErrorKind::Firebase(ref e) => ErrorResponse::from(e),
+            ErrorKind::Database(ref e) => {
+                ErrorResponse::with_status(&e, StatusCode::InternalServerError)
+            }
+            ErrorKind::AuthHeaderMissing => {
+                ErrorResponse::with_status(&e, StatusCode::Unauthorized)
+            }
+            ErrorKind::PathNotFound(..) => ErrorResponse::with_status(&e, StatusCode::NotFound),
+            ErrorKind::MissingUserIDHeader => {
+                ErrorResponse::with_status(&e, StatusCode::InternalServerError)
+            }
+            ErrorKind::Msg(..) => ErrorResponse::with_status(&e, StatusCode::InternalServerError),
         }
     }
 }

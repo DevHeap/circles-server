@@ -36,10 +36,8 @@ use std::sync::mpsc::channel;
 // @TODO move to a shared library, implement log.toml config file
 fn init_logger() -> Result<(), log::SetLoggerError> {
     let (tx, rx) = channel();
-    thread::spawn(move || {
-        while let Ok(msg) = rx.recv() {
-            print!("{}", msg);
-        }
+    thread::spawn(move || while let Ok(msg) = rx.recv() {
+        print!("{}", msg);
     });
 
     fern::Dispatch::new()
@@ -77,16 +75,13 @@ fn main() {
     let mut core = reactor::Core::new().expect("Failed to initialize event loop");
     let handle = core.handle();
 
-    // Router to dispatch requests for concrete pathes to their handlers 
+    // Router to dispatch requests for concrete pathes to their handlers
     let router = router!(
         post_positions: Method::Post, "/positions" => Rc::new(PositionsPostHandler::new(pgpool.clone())),
     );
 
     // Authenticator for firebase token verification and user info popullation in the database
-    let authenticator = Authenticator::new(
-        pgpool.clone(),
-        Rc::new(router)
-    );
+    let authenticator = Authenticator::new(pgpool.clone(), Rc::new(router));
 
     // Starting TCP server listening for incoming commections
     let listener = TcpListener::bind(&addr, &handle).unwrap();

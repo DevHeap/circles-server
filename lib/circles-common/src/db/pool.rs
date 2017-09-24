@@ -23,7 +23,7 @@ pub fn connect(db_uri: &str) -> Result<SyncPgPool> {
 /// Async PgConnection pool build on top of sync connection pool and a thread pool
 pub struct AsyncPgPool {
     conn_pool: SyncPgPool,
-    cpu_pool: CpuPool
+    cpu_pool: CpuPool,
 }
 
 use futures::Future;
@@ -37,7 +37,7 @@ impl AsyncPgPool {
     pub fn new(conn_pool: SyncPgPool) -> Self {
         AsyncPgPool {
             conn_pool,
-            cpu_pool: CpuPool::new_num_cpus()
+            cpu_pool: CpuPool::new_num_cpus(),
         }
     }
 
@@ -45,14 +45,15 @@ impl AsyncPgPool {
     pub fn connect(db_uri: &str) -> Result<Self> {
         Ok(Self::new(connect(db_uri)?))
     }
-    
+
     /// Execute a request with pooled connection from AsyncPgPool.
     /// Returns the future with a query result
     pub fn request<F, R>(&self, closure: F) -> CpuFuture<R::Item, Error>
-        where F: FnOnce(PgPooledConnection) -> R + Send + 'static,
-              R: IntoFuture<Error=Error> + 'static,
-              R::Future: Send + 'static,
-              R::Item:   Send + 'static,
+    where
+        F: FnOnce(PgPooledConnection) -> R + Send + 'static,
+        R: IntoFuture<Error = Error> + 'static,
+        R::Future: Send + 'static,
+        R::Item: Send + 'static,
     {
         let conn_pool = self.conn_pool.clone();
         self.cpu_pool.spawn_fn(move || {

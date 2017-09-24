@@ -54,8 +54,13 @@ impl<'a> From<&'a ErrorKind> for ErrorResponse {
     fn from(ek: &'a ErrorKind) -> Self {
         use firebase::ErrorKind::*;
         match *ek {
-            FailedToRetrieveKeyring(..) | Io(..) | Hyper(..) | OpenSSL(..) | OpenSSLStack(..) | Reqwest(..) | Msg(..)
-              => ErrorResponse::with_status(&ek, StatusCode::InternalServerError),
+            FailedToRetrieveKeyring(..) |
+            Io(..) |
+            Hyper(..) |
+            OpenSSL(..) |
+            OpenSSLStack(..) |
+            Reqwest(..) |
+            Msg(..) => ErrorResponse::with_status(&ek, StatusCode::InternalServerError),
             _ => ErrorResponse::with_status(&ek, StatusCode::Unauthorized),
         }
     }

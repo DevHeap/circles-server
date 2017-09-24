@@ -64,33 +64,3 @@ macro_rules! router {
         }
     }}
 }
-
-/*
-
-use hyper;
-use hyper::Request;
-use hyper::Response;
-use hyper::Method;
-use hyper::server::Service;
-use http::FutureRoute;
-use std::rc::Rc;
-
-struct DummyService;
-impl Service for DummyService {
-    type Request = Request;
-    type Response = Response;
-    type Error = hyper::Error;
-    type Future = FutureRoute;
-
-    fn call(&self, req: Request) -> Self::Future {
-        unimplemented!()
-    }
-}
-
-fn test() {
-    let router = router!(
-        post_position: Method::Post,"/position" => Rc::new(DummyService),
-    );
-}
-
-*/

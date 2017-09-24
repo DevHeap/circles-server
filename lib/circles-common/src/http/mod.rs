@@ -11,22 +11,17 @@ pub use self::auth::Authenticator;
 
 use futures::Future;
 use hyper;
-use hyper::server::{
-    Request,
-    Response,
-    Service,
-    NewService
-};
+use hyper::server::{Request, Response, Service, NewService};
 
 /// Route handler return type
-pub type FutureHandled = Box<Future<Item=Response, Error=hyper::Error>>;
+pub type FutureHandled = Box<Future<Item = Response, Error = hyper::Error>>;
 
 /// Handler Factory Trait type
 pub type HandlerFactory = NewService<
     Request = Request,
     Response = Response,
     Error = hyper::Error,
-    Instance = Box<HandlerService>
+    Instance = Box<HandlerService>,
 >;
 
 /// Handler Service Trait type
@@ -34,5 +29,5 @@ pub type HandlerService = Service<
     Request = Request,
     Response = Response,
     Error = hyper::Error,
-    Future = FutureHandled
+    Future = FutureHandled,
 >;
