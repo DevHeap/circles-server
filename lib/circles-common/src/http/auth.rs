@@ -30,10 +30,10 @@ pub struct Authenticator {
 }   
 
 impl Authenticator {
-    pub fn new(auth: Rc<AsyncTokenVerifier>, db: Rc<AsyncPgPool>, next_chain: Rc<HandlerFactory>) -> Self {
+    pub fn new(db: Rc<AsyncPgPool>, next_chain: Rc<HandlerFactory>) -> Self {
         info!("Created Authenticator (Service Factory)");
         Authenticator {
-            auth,
+            auth: Rc::new(AsyncTokenVerifier::new()),
             next_chain,
             users_db_updater: Rc::new(UsersDbUpdater::new(db))
         }
