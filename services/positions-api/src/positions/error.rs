@@ -32,8 +32,8 @@ impl<'a> From<&'a ErrorKind> for ErrorResponse {
     fn from(ek: &'a ErrorKind) -> Self {
         use positions::error::ErrorKind::*;
         match *ek {
-            Utf8(..) | Json(..)          => Self::with_status(ek, StatusCode::BadRequest),
-            Hyper(..) | Db(..) | Msg(..) => Self::with_status(ek, StatusCode::InternalServerError)
+            Utf8(..) | Json(..) => Self::with_status(ek, StatusCode::BadRequest),
+            Hyper(..) | Db(..) | Msg(..) => Self::with_status(ek, StatusCode::InternalServerError),
         }
     }
 }

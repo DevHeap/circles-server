@@ -20,15 +20,13 @@ use circles_common::http::header;
 use positions::error::Error;
 
 pub struct PositionsPostHandler {
-    db_conn: Rc<AsyncPgPool>
+    db_conn: Rc<AsyncPgPool>,
 }
 
 impl PositionsPostHandler {
     pub fn new(db_conn: Rc<AsyncPgPool>) -> Self {
-        PositionsPostHandler {
-            db_conn
-        }
-    } 
+        PositionsPostHandler { db_conn }
+    }
 }
 
 impl Service for PositionsPostHandler {
@@ -39,38 +37,39 @@ impl Service for PositionsPostHandler {
 
     fn call(&self, req: Request) -> Self::Future {
         let db_conn = self.db_conn.clone();
-        
+
         // Absence of UserID header is definitely an internal server error
         let user_id = match req.headers().get::<UserID>() {
             Some(user_id) => user_id.0.clone(),
-            None => return box ok(ErrorResponse::from(
-                header::ErrorKind::MissingUserIDHeader
-            ).into())
+            None => {
+                return box ok(
+                    ErrorResponse::from(header::ErrorKind::MissingUserIDHeader).into(),
+                )
+            }
         };
-        
+
         // Panic in debug builds here to prevent wrong routing
         assert_eq!(req.method(), &Method::Post);
         assert_eq!(req.path(), "/positions");
         debug!("accepted POST request to /positions from {}", user_id);
 
         // Wait for hyper to fetch all body chunks
-        let position_update = req.body().collect()
-            .map_err(Error::from)
-            .and_then(|chunks| 
-        {
-            // Collect chunks into one vector of bytes
-            let body = chunks.into_iter()
-                .flat_map(IntoIterator::into_iter)
-                .collect::<Vec<u8>>();
-            // Convert to a valid utf8 string
-            String::from_utf8(body)
-                .map_err(Error::from)
-                .and_then(|json_str| {
-            // Parse the body json into PositionUpdate
-                    json::from_str::<PositionUpdate>(&json_str)
-                        .map_err(Error::from)    
-                })
-        });
+        let position_update = req.body().collect().map_err(Error::from).and_then(
+            |chunks| {
+                // Collect chunks into one vector of bytes
+                let body = chunks
+                    .into_iter()
+                    .flat_map(IntoIterator::into_iter)
+                    .collect::<Vec<u8>>();
+                // Convert to a valid utf8 string
+                String::from_utf8(body).map_err(Error::from).and_then(
+                    |json_str| {
+                        // Parse the body json into PositionUpdate
+                        json::from_str::<PositionUpdate>(&json_str).map_err(Error::from)
+                    },
+                )
+            },
+        );
 
         box position_update
         // If everything've been successful so far

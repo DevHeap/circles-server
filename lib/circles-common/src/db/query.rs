@@ -1,4 +1,4 @@
-//! Convenience traits for easy querying 
+//! Convenience traits for easy querying
 
 use db::AsyncPgPool;
 use futures_cpupool::CpuFuture;
@@ -18,7 +18,8 @@ impl Insert for PositionRecord {
         use db::schema::position_records;
 
         pool.request(move |conn| {
-            diesel::insert(&self).into(position_records::table)
+            diesel::insert(&self)
+                .into(position_records::table)
                 .execute(&*conn)
                 .map_err(Error::from)
         })
@@ -33,15 +34,14 @@ impl Insert for User {
         use diesel::prelude::*;
         use diesel::pg::upsert::*;
 
-        // Insert an authentified user or, if user exists, just update 
+        // Insert an authentified user or, if user exists, just update
         pool.request(move |conn| {
             result(
-                insert(
-                    &self.on_conflict(uid, do_update().set(&self.auth_data()))
-                ).into(users)
-                 .execute(&*conn)
-                 .map_err(Error::from)
-            )    
+                insert(&self.on_conflict(uid, do_update().set(&self.auth_data())))
+                    .into(users)
+                    .execute(&*conn)
+                    .map_err(Error::from),
+            )
         })
     }
 }

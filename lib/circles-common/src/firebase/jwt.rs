@@ -13,7 +13,7 @@ use std::ops::Deref;
 
 /// Google Firebase Token
 pub struct Token {
-    idtoken: IDToken
+    idtoken: IDToken,
 }
 
 impl Token {
@@ -28,9 +28,7 @@ impl Token {
         let decoder = keyring.get(&header.kid).ok_or(ErrorKind::UnknownKeyID)?;
 
         // Construct Self object wrapping a decoded idtoken
-        let token = Token {
-            idtoken: decoder.decode(token)?
-        };
+        let token = Token { idtoken: decoder.decode(token)? };
 
         // And then we can verify token's other data correctness
         token.verify_data()?;
@@ -47,8 +45,10 @@ impl Token {
         let token = &self.idtoken;
 
         // Check that user_id is not empty
-        if token.subject_identifier().is_empty() 
-        || token.subject_identifier().chars().all(|c| c.is_whitespace()) 
+        if token.subject_identifier().is_empty() ||
+            token.subject_identifier().chars().all(
+                |c| c.is_whitespace(),
+            )
         {
             bail!(ErrorKind::EmptyUserID)
         }
@@ -67,5 +67,5 @@ impl Deref for Token {
 #[derive(Debug, Deserialize)]
 struct TokenHeader {
     alg: String,
-    kid: String
+    kid: String,
 }

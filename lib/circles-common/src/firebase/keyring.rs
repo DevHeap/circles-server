@@ -48,46 +48,42 @@ impl Keyring {
             keys: BTreeMap::new(),
             last_update: UNIX_EPOCH,
         }
-    } 
+    }
 
     /// Constructs a keyring from a kid:pkey map
     pub fn with_keys(keys: BTreeMap<KeyID, Decoder>) -> Self {
         Keyring {
             keys,
-            last_update: SystemTime::now()
+            last_update: SystemTime::now(),
         }
-    }  
+    }
 
     /// Constructs a keyring from JSON with kid:cert pairs from Google
     /// Converts certs to public keys and created an IDTokenDecoders
     pub fn from_json(json: &str) -> Result<Self> {
         let raw: BTreeMap<KeyID, String> = json::from_str(json)?;
-        
+
         let mut keys = BTreeMap::new();
         for (kid, cert_pem) in raw {
             let cert_pem = cert_pem.replace("\\n", "\n");
             let x509 = X509::from_pem(cert_pem.as_bytes())?;
             let pkey = x509.public_key()?;
-            let decoder = IDTokenDecoder::from_key(
-                pkey,
-                FIREBASE_ISSUER,
-                FIREBASE_AUDIENCE
-            );
+            let decoder = IDTokenDecoder::from_key(pkey, FIREBASE_ISSUER, FIREBASE_AUDIENCE);
             keys.insert(kid, decoder);
         }
 
         Ok(Keyring::with_keys(keys))
     }
 
-    /// Get token decoder built with key of id `kid` 
+    /// Get token decoder built with key of id `kid`
     pub fn get(&self, kid: &str) -> Option<&Decoder> {
         self.keys.get(kid)
     }
 }
 
-/// TokenVerifier maintains Google Keyring up to date 
+/// TokenVerifier maintains Google Keyring up to date
 /// and verifies tokens using the keyring
-/// 
+///
 /// @TODO avoid lag at server startup when any request ends up unauthorized
 ///       because the Keyring haven't been loaded yet (or is it really a problem?)
 pub struct TokenVerifier {
@@ -102,35 +98,37 @@ impl TokenVerifier {
         // Arc -- for sharing an onject between threads
         let keyring = Arc::new(RwLock::new(Keyring::new()));
         let keyring_c = keyring.clone();
-        
+
         // Spawn keyring update task
-        thread::spawn(|| Self::keyring_update_task(keyring_c)); 
-        
-        TokenVerifier {
-            keyring
-        }
+        thread::spawn(|| Self::keyring_update_task(keyring_c));
+
+        TokenVerifier { keyring }
     }
 
     /// Decode and verify a Firebase IDToken
     pub fn verify_token<T>(&self, token: T) -> Result<Token>
-        where T: Into<Cow<'static, str>>
+    where
+        T: Into<Cow<'static, str>>,
     {
         Token::decode(&token.into(), &*self.keyring.read().unwrap())
     }
 
     fn keyring_update_task(keyring: Arc<RwLock<Keyring>>) {
         info!("Starting up keys updater thread");
-        
+
         loop {
             // We do not want to update keyring if it was just created
-            // (mainly for testing purposes) 
+            // (mainly for testing purposes)
             let need_update = {
                 let keyring = keyring.read().unwrap();
                 match keyring.last_update.elapsed() {
                     Ok(duration) => duration > Duration::from_secs(KEYRING_RELOAD_REPIOD),
                     Err(error) => {
-                        warn!("SystemTime is in the past by {} seconds", error.duration().as_secs());
-                        true    
+                        warn!(
+                            "SystemTime is in the past by {} seconds",
+                            error.duration().as_secs()
+                        );
+                        true
                     }  
                 }
             };
@@ -190,7 +188,7 @@ impl AsyncTokenVerifier {
     }
 
     /// Asynchronously Verify JWT Token
-    pub fn authenticate(&self, token: String) -> impl Future<Item=Token, Error=Error> {
+    pub fn authenticate(&self, token: String) -> impl Future<Item = Token, Error = Error> {
         let verifier = self.verifier.clone();
         self.cpupool.spawn_fn(move || verifier.verify_token(token))
     }

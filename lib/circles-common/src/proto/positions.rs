@@ -15,7 +15,7 @@ pub struct PositionUpdate {
     bearing: Option<f32>,
     speed: Option<f32>,
     speed_accuracy: Option<f32>,
-    location: Option<String>
+    location: Option<String>,
 }
 
 impl PositionUpdate {
@@ -32,7 +32,7 @@ impl PositionUpdate {
             bearing: self.bearing,
             speed: self.speed,
             speed_accuracy: self.speed_accuracy,
-            location: self.location
+            location: self.location,
         }
     }
 }
