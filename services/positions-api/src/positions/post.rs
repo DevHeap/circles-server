@@ -35,12 +35,12 @@ impl Service for PositionsPostHandler {
     type Error = hyper::Error;
     type Future = FutureHandled;
 
-    fn call(&self, req: Request) -> Self::Future {
+    fn call(&self, mut req: Request) -> Self::Future {
         let db_conn = self.db_conn.clone();
 
         // Absence of UserID header is definitely an internal server error
-        let user_id = match req.headers().get::<UserID>() {
-            Some(user_id) => user_id.0.clone(),
+        let user_id = match req.headers_mut().remove::<UserID>() {
+            Some(user_id) => user_id.0,
             None => {
                 return box ok(
                     ErrorResponse::from(http::error::ErrorKind::MissingUserIDHeader).into(),
