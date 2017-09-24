@@ -1,6 +1,6 @@
 #![allow(unused_doc_comment)]
 
-use hyper_common::ErrorResponse;
+use circles_common::http::ErrorResponse;
 use hyper::StatusCode;
 
 error_chain!{

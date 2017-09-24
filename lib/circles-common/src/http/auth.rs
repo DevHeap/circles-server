@@ -11,8 +11,8 @@ use std::io;
 use firebase::Token;
 use firebase::AsyncTokenVerifier;
 
-use http::router::Router;
-use http::router::FutureRoute;
+use http::HandlerFactory;
+use http::FutureHandled;
 use http::header::UserID;
 use http::ErrorResponse;
 
@@ -25,16 +25,16 @@ use db::AsyncPgPool;
 /// Authenticator Service factory with "persistent" state
 pub struct Authenticator {
     auth: Rc<AsyncTokenVerifier>,
-    router: Rc<Router>,
+    next_chain: Rc<HandlerFactory>,
     users_db_updater: Rc<UsersDbUpdater>,
 }   
 
 impl Authenticator {
-    pub fn new(auth: Rc<AsyncTokenVerifier>, db: Rc<AsyncPgPool>, router: Rc<Router>) -> Self {
+    pub fn new(auth: Rc<AsyncTokenVerifier>, db: Rc<AsyncPgPool>, next_chain: Rc<HandlerFactory>) -> Self {
         info!("Created Authenticator (Service Factory)");
         Authenticator {
             auth,
-            router,
+            next_chain,
             users_db_updater: Rc::new(UsersDbUpdater::new(db))
         }
     }
@@ -50,7 +50,7 @@ impl NewService for Authenticator {
         debug!("Created Authenticator Service");
         let service = AuthenticatorService {
             auth: self.auth.clone(),
-            router: self.router.clone(),
+            next_chain: self.next_chain.clone(),
             users_db_updater: self.users_db_updater.clone()
         };
         Ok(service)
@@ -59,7 +59,7 @@ impl NewService for Authenticator {
 
 pub struct AuthenticatorService {
     auth: Rc<AsyncTokenVerifier>,
-    router: Rc<Router>,
+    next_chain: Rc<HandlerFactory>,
     users_db_updater: Rc<UsersDbUpdater>,
 }
 
@@ -91,7 +91,7 @@ impl Service for AuthenticatorService {
             Err(error) => return box future::ok(error.into())
         };
 
-        let router = self.router.new_service()
+        let next_chain = self.next_chain.new_service()
         // Can never happen. Really.
             .unwrap(); 
 
@@ -99,7 +99,7 @@ impl Service for AuthenticatorService {
 
         // Either pass the request to the Dispatcher or return error response to a client
         let future_response = self.auth.authenticate(token).map_err(MwError::from)
-            .then(move |auth_result: MwResult<Token>| -> FutureRoute 
+            .then(move |auth_result: MwResult<Token>| -> FutureHandled 
         {
             match auth_result {
                 Ok(token) => {
@@ -112,7 +112,7 @@ impl Service for AuthenticatorService {
                     // Update users database table and proceed to the router 
                     let db_future = users_db.update_if_needed(&token).then(move |res| {
                         match res {
-                            Ok(..) => router.call(req),
+                            Ok(..) => next_chain.call(req),
                             Err(e) => box future::ok(ErrorResponse::from(e).into())
                         }
                     });
