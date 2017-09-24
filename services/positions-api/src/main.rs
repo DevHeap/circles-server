@@ -80,7 +80,7 @@ fn main() {
         post_positions: Method::Post, "/positions" => Rc::new(PositionsPostHandler::new(pgpool.clone())),
     );
 
-    // Authenticator for firebase token verification and user info popullation in the database
+    // Authenticator for firebase token verification and user info population in the database
     let authenticator = Authenticator::new(pgpool.clone(), Rc::new(router));
 
     // Starting TCP server listening for incoming commections

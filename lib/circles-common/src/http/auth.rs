@@ -62,7 +62,7 @@ impl NewService for Authenticator {
 }
 
 /// AuthenticatorService is responsible for tokens verification
-/// and popullating the database with user info
+/// and populating the database with user info
 pub struct AuthenticatorService {
     auth: Rc<AsyncTokenVerifier>,
     next_chain: Rc<HandlerFactory>,

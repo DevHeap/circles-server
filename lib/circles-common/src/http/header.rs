@@ -1,4 +1,3 @@
-#![allow(unused_doc_comment)]
 //! Custom Hyper headers
 
 use hyper::header::Header;
@@ -32,13 +31,6 @@ impl Deref for UserID {
     type Target = str;
     fn deref(&self) -> &Self::Target {
         &self.0
-    }
-}
-
-#[allow(missing_docs)]
-error_chain! {
-    errors {
-        
     }
 }
 
