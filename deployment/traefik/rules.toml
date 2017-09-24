@@ -1,0 +1,10 @@
+[frontends]
+  [frontends.frontend1]
+  backend = "backend1"
+    [frontends.frontend1.routes.test1]
+    rule = "Host:localhost;Path:/positions"
+
+[backends]
+  [backends.backend1]
+    [backends.backend1.servers.server1]
+      url = "http://localhost:7701"
