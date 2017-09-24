@@ -1,6 +1,9 @@
+//! JSON proto models for the /positions api
+
 use db::models::PositionRecord;
 use chrono::NaiveDateTime;
 
+/// JSON model for position update from user
 #[derive(Debug, Deserialize)]
 pub struct PositionUpdate {
     time: NaiveDateTime,
@@ -16,6 +19,7 @@ pub struct PositionUpdate {
 }
 
 impl PositionUpdate {
+    /// Convert PositionUpdate to a PositionRecord database model
     pub fn into_position_record(self, user_uid: String) -> PositionRecord {
         PositionRecord {
             time: self.time,

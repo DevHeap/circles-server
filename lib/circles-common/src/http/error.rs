@@ -1,5 +1,6 @@
 
 #![allow(unused_doc_comment)]
+#![allow(missing_docs)]
 
 use hyper::StatusCode;
 use hyper::Method;
@@ -21,17 +22,23 @@ error_chain!{
             description("path not found")
             display("path {} for method {} does not exist", path, method)
         }
+        
+        MissingUserIDHeader {
+            description("missing UserID header")
+            display("missing UserID header")
+        }
     }
 }
 
 impl From<Error> for ErrorResponse {
     fn from(e: Error) -> Self {
         match *e.kind() {
-            ErrorKind::Firebase(ref e)   => ErrorResponse::from(e),
-            ErrorKind::Database(ref e)   => ErrorResponse::with_status(&e, StatusCode::InternalServerError),
-            ErrorKind::AuthHeaderMissing => ErrorResponse::with_status(&e, StatusCode::Unauthorized),
-            ErrorKind::PathNotFound(..)  => ErrorResponse::with_status(&e, StatusCode::NotFound),
-            ErrorKind::Msg(..)           => ErrorResponse::with_status(&e, StatusCode::InternalServerError)
+            ErrorKind::Firebase(ref e)     => ErrorResponse::from(e),
+            ErrorKind::Database(ref e)     => ErrorResponse::with_status(&e, StatusCode::InternalServerError),
+            ErrorKind::AuthHeaderMissing   => ErrorResponse::with_status(&e, StatusCode::Unauthorized),
+            ErrorKind::PathNotFound(..)    => ErrorResponse::with_status(&e, StatusCode::NotFound),
+            ErrorKind::MissingUserIDHeader => ErrorResponse::with_status(&e, StatusCode::InternalServerError),
+            ErrorKind::Msg(..)             => ErrorResponse::with_status(&e, StatusCode::InternalServerError)
         }
     }
 }

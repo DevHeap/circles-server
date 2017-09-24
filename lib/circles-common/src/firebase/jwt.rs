@@ -1,4 +1,5 @@
-/// @TODO: tests
+//! JWT IDToken decoding and verigication
+//! @TODO: tests
 
 use jwt;
 use jwt::id_token::IDToken;
@@ -16,6 +17,7 @@ pub struct Token {
 }
 
 impl Token {
+    /// Decode and verify the base64 encode JWT Token using provided Keyring
     pub fn decode(token: &str, keyring: &Keyring) -> Result<Token> {
         // Decode and deserialize token keader to retrieve "kid"
         let header = token.split(".").nth(0).ok_or(jwt::Error::JWTInvalid)?;
@@ -36,6 +38,7 @@ impl Token {
         Ok(token)
     }
 
+    /// Get user unique identifier
     pub fn user_id(&self) -> &str {
         self.idtoken.subject_identifier()
     }

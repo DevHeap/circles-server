@@ -1,3 +1,6 @@
+
+//! Data types reflecting actual database tables schema
+
 use db::schema::*;
 use chrono::NaiveDateTime;
 use firebase::Token;
@@ -7,11 +10,17 @@ use firebase::Token;
 #[table_name="users"]
 #[primary_key(uid)]
 pub struct User {
+    /// User unique identifier from Google Firebase API
     pub uid: String,
+    /// Username
     pub username: Option<String>,
+    /// Uri of userpic
     pub picture: Option<String>,
+    /// User email
     pub email: Option<String>,
+    /// Firebase token issue time (basically an authentication time)
     pub auth_time: NaiveDateTime,
+    /// Firebase token expiration time
     pub auth_until: NaiveDateTime
 }
 
@@ -19,7 +28,9 @@ pub struct User {
 #[derive(AsChangeset)]
 #[table_name="users"]
 pub struct UserAuthData {
+    /// Firebase token issue time (basically an authentication time)
     pub auth_time: NaiveDateTime,
+    /// Firebase token expiration time
     pub auth_until: NaiveDateTime
 }
 
@@ -57,15 +68,26 @@ impl User {
 #[table_name="position_records"]
 #[primary_key(time, user_uid)]
 pub struct PositionRecord {
+    /// UTC time of GPS fix (from client)
     pub time: NaiveDateTime,
+    /// User unique identifier from Google Firebase API
     pub user_uid: String,
+    /// Latitude, in degrees. 
     pub latitude: f64,
+    /// Longitude, in degrees. 
     pub longitude: f64,
+    /// Estimated horizontal accuracy of this location, radial, in meters. 
     pub accuracy: Option<f32>,
+    /// Altitude in meters above the WGS 84 reference ellipsoid. 
     pub altitude: Option<f64>,
+    /// Estimated vertical accuracy of this location, in meters. 
     pub vertical_accuracy: Option<f32>,
+    /// Bearing, in degrees. 
     pub bearing: Option<f32>,
+    /// Speed in meters/second over ground. 
     pub speed: Option<f32>,
+    /// Estimated speed accuracy of this location, in meters per second. 
     pub speed_accuracy: Option<f32>,
+    /// Human-readable location name
     pub location: Option<String>
 }

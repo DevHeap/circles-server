@@ -1,3 +1,5 @@
+//! Request authentication proxy middleware
+
 use hyper::{Request, Response};
 use hyper::header::{Authorization, Bearer};
 use hyper::server::{Service, NewService};
@@ -22,6 +24,8 @@ use http::error::Error;
 use db::AsyncPgPool;
 
 /// Authenticator Service factory with "persistent" state
+/// 
+/// For usage example please refer to one of already implemented microservices
 pub struct Authenticator {
     auth: Rc<AsyncTokenVerifier>,
     next_chain: Rc<HandlerFactory>,
@@ -29,6 +33,7 @@ pub struct Authenticator {
 }   
 
 impl Authenticator {
+    /// Create a new AuthenticatorService factory with persistent state
     pub fn new(db: Rc<AsyncPgPool>, next_chain: Rc<HandlerFactory>) -> Self {
         info!("Created Authenticator (Service Factory)");
         Authenticator {
@@ -56,6 +61,8 @@ impl NewService for Authenticator {
     }
 }
 
+/// AuthenticatorService is responsible for tokens verification
+/// and popullating the database with user info
 pub struct AuthenticatorService {
     auth: Rc<AsyncTokenVerifier>,
     next_chain: Rc<HandlerFactory>,

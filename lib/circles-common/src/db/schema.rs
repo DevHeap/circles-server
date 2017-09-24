@@ -1,4 +1,7 @@
 #![allow(non_snake_case)]
+#![allow(missing_docs)]
+
+//! Diesel generated schema and tables access DSL
 
 table! {
     position_records (time, user_uid) {
