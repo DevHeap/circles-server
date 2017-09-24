@@ -2,7 +2,7 @@
 [![Build Status](https://travis-ci.org/DevHeap/circles-server.svg?branch=master)](https://travis-ci.org/DevHeap/circles-server)
 
 ## Deployment
-
+Deployment scripts and data can be found in the `deployment` directory
 ### Database
 ##### Setup postgresql
 Install PostgreSql and run a service
@@ -29,6 +29,25 @@ diesel migration run
 
 If you encountered any problems during the last step, check that .env file contains URI with right credentials and your USER all necessary rights.
 
+### Docker preparation
+Make sure you have `docker` and `docker-compose` installed, start the docker service
+```
+systemctl start docker
+```
+
+### Traefik proxy
+Traefik configuration files are located in `deployment/traefik`
+
+To start up Traefik with docker, run
+```
+deployment/traefik/start.sh
+```
+And to stop it
+```
+deployment/traefik/stop.sh
+```
+
+For alternative ways to launch Traefik and for the configuration guides please refer to the [repository](https://github.com/containous/traefik) and to the [official documentation](https://docs.traefik.io/)
 
 ### Graylog
 If you already have an /etc/graylog directory, remove it.
@@ -40,10 +59,6 @@ sudo ./deploy.sh
 
 ##### And now it's a Docker time!
 
-Make sure you have `docker` and `docker-compose` installed, start the docker service
-```
-systemctl start docker
-```
 
 And start a Graylog instance
 ```
