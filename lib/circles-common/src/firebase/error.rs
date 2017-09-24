@@ -1,7 +1,7 @@
 #![allow(unused_doc_comment)]
 
 use hyper::StatusCode;
-use hyper_common::ErrorResponse;
+use http::ErrorResponse;
 
 // Generate error types boilerplate
 

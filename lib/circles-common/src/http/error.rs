@@ -3,9 +3,14 @@
 
 use hyper::StatusCode;
 use hyper::Method;
-use hyper_common::ErrorResponse;
+use http::ErrorResponse;
 
-error_chain! {
+error_chain!{
+    links {
+        Firebase(::firebase::Error, ::firebase::ErrorKind);
+        Database(::db::Error, ::db::ErrorKind);
+    }
+
     errors {
         AuthHeaderMissing {
             description("missing Authorization header")
@@ -21,11 +26,12 @@ error_chain! {
 
 impl From<Error> for ErrorResponse {
     fn from(e: Error) -> Self {
-        use ErrorKind::*;
         match *e.kind() {
-            AuthHeaderMissing => ErrorResponse::with_status(&e, StatusCode::Unauthorized),
-            PathNotFound(..)  => ErrorResponse::with_status(&e, StatusCode::NotFound),
-            Msg(..)           => ErrorResponse::with_status(&e, StatusCode::InternalServerError),
+            ErrorKind::Firebase(ref e)   => ErrorResponse::from(e),
+            ErrorKind::Database(ref e)   => ErrorResponse::with_status(&e, StatusCode::InternalServerError),
+            ErrorKind::AuthHeaderMissing => ErrorResponse::with_status(&e, StatusCode::Unauthorized),
+            ErrorKind::PathNotFound(..)  => ErrorResponse::with_status(&e, StatusCode::NotFound),
+            ErrorKind::Msg(..)           => ErrorResponse::with_status(&e, StatusCode::InternalServerError)
         }
     }
 }

@@ -31,9 +31,3 @@ git = "https://github.com/DevHeap/rusty_jwt"
 
 [dependencies.service-fn]
 git = "https://github.com/tokio-rs/service-fn"
-
-[dependencies.circles-router]
-path = "../circles-router/"
-
-[dependencies.hyper-common]
-path = "../hyper-common/"

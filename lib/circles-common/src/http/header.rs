@@ -43,7 +43,7 @@ error_chain! {
     }
 }
 
-use error_response::ErrorResponse;
+use http::ErrorResponse;
 
 impl From<Error> for ErrorResponse {
     fn from(e: Error) -> Self {
