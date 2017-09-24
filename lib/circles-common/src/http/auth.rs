@@ -16,9 +16,8 @@ use http::FutureHandled;
 use http::header::UserID;
 use http::ErrorResponse;
 
-use http::error::ErrorKind as MwErrorKind;
-use http::error::Result as MwResult;
-use http::error::Error as MwError;
+use http::error::ErrorKind;
+use http::error::Error;
 
 use db::AsyncPgPool;
 
@@ -67,7 +66,7 @@ impl AuthenticatorService {
     fn extract_token(req: &Request) -> Result<String, ErrorResponse> {
         let headers = req.headers();
         let bearer: &Authorization<Bearer> = headers.get()
-            .ok_or(ErrorResponse::from(MwErrorKind::AuthHeaderMissing))?;
+            .ok_or(ErrorResponse::from(ErrorKind::AuthHeaderMissing))?;
 
         // @TODO can we avoid cloning here?
         Ok(bearer.token.clone())
@@ -98,8 +97,8 @@ impl Service for AuthenticatorService {
         let users_db = self.users_db_updater.clone();
 
         // Either pass the request to the Dispatcher or return error response to a client
-        let future_response = self.auth.authenticate(token).map_err(MwError::from)
-            .then(move |auth_result: MwResult<Token>| -> FutureHandled 
+        let future_response = self.auth.authenticate(token).map_err(Error::from)
+            .then(move |auth_result| -> FutureHandled 
         {
             match auth_result {
                 Ok(token) => {
@@ -126,7 +125,7 @@ impl Service for AuthenticatorService {
                 }
             }
         });
-
+        
         box future_response
     }
 }
@@ -150,7 +149,7 @@ impl UsersDbUpdater {
     }
 
     // Update DB only for users whose token expiration was not cached yet
-    fn update_if_needed(&self, token: &Token) -> Box<Future<Item=(), Error=MwError>> {
+    fn update_if_needed(&self, token: &Token) -> Box<Future<Item=(), Error=Error>> {
         let user_id = token.user_id();
         let exp = NaiveDateTime::from_timestamp(token.expiration_time() as i64, 0);
 
@@ -165,32 +164,14 @@ impl UsersDbUpdater {
         }
     }
 
-    fn update(&self, token: &Token) -> impl Future<Item=(), Error=MwError> {
-        use db::schema::users::dsl::*;
+    fn update(&self, token: &Token) -> impl Future<Item=(), Error=Error> {
         use db::models::User;
-        use db::error::Error;
-        use futures::future::result;
-        use diesel::insert;
-        use diesel::prelude::*;
-        use diesel::pg::upsert::*;
+        use db::query::Insert;
 
         let user = User::from(token);
         let user_id = user.uid.clone();
-
-        debug!("started updating users db table for {}", token.user_id());
-
-        // Insert an authentified user or, if user exists, just update 
-        let db_future = self.db.request(move |conn| {
-            result(
-                insert(
-                    &user.on_conflict(uid, do_update().set(&user.auth_data()))
-                ).into(users)
-                 .execute(&*conn)
-                 .map_err(Error::from)
-            )    
-        });
-
-        db_future.map_err(MwError::from)
+        
+        user.insert(&self.db)
             .then(move |result| {
                 match result {
                     Ok(ref rows) => debug!("successfully updated {} rows for user {}", rows, user_id),
@@ -198,6 +179,7 @@ impl UsersDbUpdater {
                 }
                 result.map(|_|())
             })
+            .map_err(Error::from)
     }
 }
 
