@@ -70,14 +70,13 @@ pub struct AuthenticatorService {
 }
 
 impl AuthenticatorService {
-    fn extract_token(req: &Request) -> Result<String, ErrorResponse> {
+    fn extract_token(req: &Request) -> Result<&str, ErrorResponse> {
         let headers = req.headers();
         let bearer: &Authorization<Bearer> = headers.get().ok_or(ErrorResponse::from(
             ErrorKind::AuthHeaderMissing,
         ))?;
 
-        // @TODO can we avoid cloning here?
-        Ok(bearer.token.clone())
+        Ok(&bearer.token)
     }
 }
 
@@ -88,13 +87,11 @@ impl Service for AuthenticatorService {
     type Future = Box<Future<Item = Self::Response, Error = Self::Error>>;
 
     fn call(&self, mut req: Request) -> Self::Future {
-        let uri = req.uri().clone();
-
         trace!("accepted {} request for {}", req.method(), req.uri());
 
         // Extract IDToken from headers
         let token = match Self::extract_token(&req) {
-            Ok(token) => token,
+            Ok(token) => token.to_owned(),
             Err(error) => return box future::ok(error.into()),
         };
 
@@ -127,7 +124,7 @@ impl Service for AuthenticatorService {
                         box db_future
                     }
                     Err(e) => {
-                        debug!("attempted unathorized access to {}", uri);
+                        debug!("attempted unathorized access to {}", req.path());
                         box future::ok(ErrorResponse::from(e).into())
                     }
                 }
@@ -190,7 +187,7 @@ impl UsersDbUpdater {
                     Ok(ref rows) => {
                         debug!("successfully updated {} rows for user {}", rows, user_id)
                     }
-                    Err(ref e) => error!("failed to update db for user {}: {}", user_id, e),
+                    Err(ref e) => error!("failed to update db for user {}: {}", user_id, e),                
                 }
                 result.map(|_| ())
             })
