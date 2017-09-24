@@ -10,14 +10,10 @@ error-chain = "^0.10"
 chrono = "^0.4"
 log = "0.3"
 fern = "^0.4"
-diesel = { version = "^0.16", features = ["postgres", "chrono"] }
 serde_json = "^1.0"
 
 [dependencies.hyper]
 git = "https://github.com/DevHeap/hyper"
-
-[dependencies.service-fn]
-git = "https://github.com/tokio-rs/service-fn"
 
 [dependencies.circles-common]
 path = "../../lib/circles-common/"
