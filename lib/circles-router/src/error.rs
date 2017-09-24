@@ -2,6 +2,7 @@
 #![allow(unused_doc_comment)]
 
 use hyper::StatusCode;
+use hyper::Method;
 use hyper_common::ErrorResponse;
 
 error_chain! {
@@ -11,9 +12,9 @@ error_chain! {
             display("missing Authorization header")
         }
 
-        PathNotFound(path: String) {
+        PathNotFound(method: Method, path: String) {
             description("path not found")
-            display("path {} does not exist", path)
+            display("path {} for method {} does not exist", path, method)
         }
     }
 }

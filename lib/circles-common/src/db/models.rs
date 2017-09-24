@@ -1,4 +1,4 @@
-use db::schema::users;
+use db::schema::*;
 use chrono::NaiveDateTime;
 use firebase::Token;
 
@@ -50,4 +50,22 @@ impl User {
             auth_until: self.auth_until
         }
     } 
+}
+
+/// PositionResord model for the "users" table
+#[derive(Queryable, Identifiable, Insertable)]
+#[table_name="position_records"]
+#[primary_key(time, user_uid)]
+pub struct PositionRecord {
+    pub time: NaiveDateTime,
+    pub user_uid: String,
+    pub latitude: f64,
+    pub longitude: f64,
+    pub accuracy: Option<f32>,
+    pub altitude: Option<f64>,
+    pub vertical_accuracy: Option<f32>,
+    pub bearing: Option<f32>,
+    pub speed: Option<f32>,
+    pub speed_accuracy: Option<f32>,
+    pub location: Option<String>
 }

@@ -5,12 +5,15 @@ use hyper;
 use futures::Future;
 use futures::future;
 use std::collections::BTreeMap;
+use std::collections::HashMap;
 use std::borrow::Cow;
 use std::rc::Rc;
 use std::io;
+use std::hash::Hash;
 
 use ::error::ErrorKind;
 
+use hyper::Method;
 use hyper_common::header::UserID;
 use hyper_common::ErrorResponse;
 
@@ -25,7 +28,19 @@ pub type HandlerService = Service<
     Future = FutureRoute
 >;
 
-type Routes = BTreeMap<String, Rc<HandlerService>>;
+#[derive(Debug, Hash, Eq, PartialEq)]
+struct Route {
+    method: Method,
+    endpoint: Cow<'static, str>
+}
+
+impl Route {
+    pub fn new(method: Method, endpoint: Cow<'static, str>) -> Self {
+        Route { method, endpoint }
+    }
+}
+
+type Routes = HashMap<Route, Rc<HandlerService>>;
 
 /// Router dispatches requests to specific handlers based on the request path
 /// 
@@ -68,15 +83,16 @@ pub struct RouterBuilder {
 impl RouterBuilder {
     pub fn new() -> Self {
         RouterBuilder {
-            routes: BTreeMap::new()
+            routes: Routes::new()
         }
     }
 
-    pub fn add_route<P>(mut self, path: P, handler: Box<HandlerService>) -> Self
+    pub fn bind<P>(mut self, method: Method, endpoint: P, handler: Box<HandlerService>) -> Self
         where P: Into<Cow<'static, str>>
     {
-        let path = path.into();
-        self.routes.insert(path.into_owned(), Rc::new(handler));
+        let endpoint = endpoint.into();
+        let route = Route::new(method, endpoint);
+        self.routes.insert(route, Rc::new(handler));
         self
     }
 
@@ -127,11 +143,14 @@ impl Service for RouterService {
         
             debug!("{}", message);
 
-            let handler = match self.routes.get(path) {
+            // @TODO: Hell knows how, but find a way to avoid cloning 
+            let route = Route::new(method.clone(), Cow::from(req.path().to_owned()));
+            
+            let handler = match self.routes.get(&route) {
                 Some(handler) => handler,
                 None => return box future::ok(
                     ErrorResponse::from(
-                        ErrorKind::PathNotFound(path.to_owned())
+                        ErrorKind::PathNotFound(method.clone(), path.to_owned())
                     ).into()
                 )
             };

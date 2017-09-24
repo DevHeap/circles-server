@@ -2,6 +2,7 @@
 members = [
     "lib/circles-router/",
     "lib/hyper-common/",
+    "lib/circles-common",
     "services/dispatcher",
-    "lib/circles-common"
+    "services/positions-api"
 ]
