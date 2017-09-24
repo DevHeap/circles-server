@@ -27,4 +27,6 @@ extern crate error_chain;
 pub mod db;
 pub mod firebase;
 pub mod proto;
+
+#[macro_use]
 pub mod http;

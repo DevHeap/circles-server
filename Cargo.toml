@@ -1,6 +1,5 @@
 [workspace]
 members = [
     "lib/circles-common",
-    "services/dispatcher",
     "services/positions-api"
 ]

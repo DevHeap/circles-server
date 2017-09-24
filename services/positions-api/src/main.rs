@@ -2,11 +2,9 @@
 #![recursion_limit = "1024"]
 
 extern crate tokio_core;
-extern crate service_fn;
 extern crate futures;
 extern crate hyper;
 extern crate chrono;
-extern crate diesel;
 
 #[macro_use]
 extern crate error_chain;
@@ -16,22 +14,18 @@ extern crate log;
 extern crate fern;
 extern crate serde_json as json;
 
-extern crate circles_router;
+#[macro_use]
 extern crate circles_common;
-extern crate hyper_common;
 
 mod positions;
 use positions::post::PositionsPostHandler;
 
 use hyper::server::Http;
 use hyper::server::NewService;
-use hyper::Method;
 use tokio_core::reactor;
 use tokio_core::net::TcpListener;
 use futures::Stream;
 
-use circles_router::RouterBuilder;
-use circles_router::router::Router;
 use circles_common::db::AsyncPgPool;
 
 use std::rc::Rc;
@@ -83,9 +77,9 @@ fn main() {
     let handle = core.handle();
 
     // Router to dispatch requests for concrete pathes to their handlers 
-    let router = RouterBuilder::new()
-        .bind(Method::Post, "/positions", box PositionsPostHandler::new(pgpool))
-        .build();
+    let router = router!(
+        post_positions: Method::Post, "/positions" => Rc::new(PositionsPostHandler::new(pgpool)),
+    );
 
     // Starting TCP server listening for incoming commections
     let listener = TcpListener::bind(&addr, &handle).unwrap();
@@ -102,11 +96,3 @@ fn main() {
     // Launching an event loop: unless it is spinned up, nothing happens
     core.run(server).expect("Critical server failure");
 }
-
-use service_fn::service_fn;
-use hyper::server::Request;
-use hyper::server::Response;
-use futures::future;
-use hyper_common::header::UserID;
-use circles_router::FutureRoute;
-

@@ -9,13 +9,13 @@ use futures::future::ok;
 
 use json;
 
-use circles_router::FutureRoute;
 use circles_common::db::AsyncPgPool;
 use circles_common::db::query::*;
 use circles_common::proto::positions::PositionUpdate;
-use hyper_common::header::UserID;
-use hyper_common::ErrorResponse;
-use hyper_common::header;
+use circles_common::http::FutureHandled;
+use circles_common::http::header::UserID;
+use circles_common::http::ErrorResponse;
+use circles_common::http::header;
 
 use positions::error::Error;
 
@@ -35,7 +35,7 @@ impl Service for PositionsPostHandler {
     type Request = Request;
     type Response = Response;
     type Error = hyper::Error;
-    type Future = FutureRoute;
+    type Future = FutureHandled;
 
     fn call(&self, req: Request) -> Self::Future {
         let db_conn = self.db_conn.clone();

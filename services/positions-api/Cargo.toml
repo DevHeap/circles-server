@@ -19,11 +19,5 @@ git = "https://github.com/DevHeap/hyper"
 [dependencies.service-fn]
 git = "https://github.com/tokio-rs/service-fn"
 
-[dependencies.circles-router]
-path = "../../lib/circles-router/"
-
-[dependencies.hyper-common]
-path = "../../lib/hyper-common/"
-
 [dependencies.circles-common]
 path = "../../lib/circles-common/"
