@@ -1,4 +1,5 @@
 #![allow(unused_doc_comment)]
+#![allow(missing_docs)]
 
 use hyper::StatusCode;
 use http::ErrorResponse;

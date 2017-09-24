@@ -1,3 +1,5 @@
+//! Database connection pool
+
 use diesel::pg::PgConnection;
 use r2d2_diesel::ConnectionManager;
 use r2d2::{Pool, PooledConnection};

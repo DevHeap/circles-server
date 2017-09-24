@@ -1,3 +1,4 @@
+//! Server Response with an error message
 
 use std::fmt;
 use std::fmt::Display;
@@ -15,12 +16,12 @@ use hyper::StatusCode;
 ///
 /// ```
 /// extern crate hyper;
-/// extern crate hyper_common;
+/// extern crate circles_common;
 /// 
 /// use std::error::Error;
 /// use std::fmt;
 /// use hyper::StatusCode;
-/// use hyper_common::ErrorResponse; 
+/// use circles_common::http::ErrorResponse; 
 ///
 /// #[derive(Debug)]
 /// enum MyError {
@@ -54,7 +55,7 @@ use hyper::StatusCode;
 ///     }    
 /// }
 ///
-/// fn main() {}
+/// # fn main() {}
 /// ```
 #[derive(Debug)]
 pub struct ErrorResponse {

@@ -1,4 +1,12 @@
 #![feature(conservative_impl_trait, box_syntax)] 
+#![deny(missing_docs)]
+
+//! Crate of the common building blocks for the Circles microservices
+//!
+//! Everything that may be used twice or more in separate microservices
+//! must be placed here.
+//!
+//! Copy-Paste driven development is a no-no :)
 
 #[macro_use]
 extern crate diesel_codegen;
@@ -24,9 +32,13 @@ extern crate base64;
 #[macro_use]
 extern crate error_chain;
 
+/// Database model, schema and convenience traits
 pub mod db;
+/// Firebase JWT tokens decode and verification routines
 pub mod firebase;
+/// JSON types and protocol
 pub mod proto;
 
+/// Everything for Hyper and Http servers
 #[macro_use]
 pub mod http;

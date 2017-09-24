@@ -1,3 +1,5 @@
+//! Static Router construction macro
+
 #[macro_export]
 macro_rules! router {
     ($($name:tt: $method:path, $path:expr => $handler:expr,)*) => {{       

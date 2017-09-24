@@ -1,3 +1,6 @@
+
+//! Token Verifiers built with Google Keyring
+
 use std::collections::BTreeMap;
 use std::io::Read;
 use std::borrow::Cow;
@@ -33,7 +36,9 @@ pub struct Keyring {
     last_update: SystemTime,
 }
 
+/// Google Keyring key identifier
 pub type KeyID = String;
+/// Token decoder build with one of Public Keys from Google Keyring
 pub type Decoder = IDTokenDecoder;
 
 impl Keyring {
@@ -74,6 +79,7 @@ impl Keyring {
         Ok(Keyring::with_keys(keys))
     }
 
+    /// Get token decoder built with key of id `kid` 
     pub fn get(&self, kid: &str) -> Option<&Decoder> {
         self.keys.get(kid)
     }
@@ -89,6 +95,7 @@ pub struct TokenVerifier {
 }
 
 impl TokenVerifier {
+    /// Constructs a TokenVerifier with an automatic Keyring updater thread
     pub fn new() -> Self {
         // Create an empty keyring wrapped in:
         // RwLock -- for multithreaded read/write locking
@@ -104,6 +111,7 @@ impl TokenVerifier {
         }
     }
 
+    /// Decode and verify a Firebase IDToken
     pub fn verify_token<T>(&self, token: T) -> Result<Token>
         where T: Into<Cow<'static, str>>
     {
@@ -172,6 +180,8 @@ pub struct AsyncTokenVerifier {
 }
 
 impl AsyncTokenVerifier {
+    /// Constructs an AsyncTokenVerifier with a TokenVerifier
+    /// and a CpuPool to run async verification tasks
     pub fn new() -> Self {
         AsyncTokenVerifier {
             cpupool: CpuPool::new_num_cpus(),

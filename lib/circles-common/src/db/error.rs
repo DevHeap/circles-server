@@ -1,4 +1,6 @@
 #![allow(unused_doc_comment)]
+#![allow(missing_docs)]
+//! Database error_chain
 
 error_chain! {
     foreign_links {
