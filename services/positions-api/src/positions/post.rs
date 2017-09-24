@@ -15,7 +15,7 @@ use circles_common::proto::positions::PositionUpdate;
 use circles_common::http::FutureHandled;
 use circles_common::http::header::UserID;
 use circles_common::http::ErrorResponse;
-use circles_common::http::header;
+use circles_common::http;
 
 use positions::error::Error;
 
@@ -43,7 +43,7 @@ impl Service for PositionsPostHandler {
             Some(user_id) => user_id.0.clone(),
             None => {
                 return box ok(
-                    ErrorResponse::from(header::ErrorKind::MissingUserIDHeader).into(),
+                    ErrorResponse::from(http::error::ErrorKind::MissingUserIDHeader).into(),
                 )
             }
         };
@@ -79,7 +79,7 @@ impl Service for PositionsPostHandler {
             let position_record = position_update.into_position_record(user_id);
             // Insert it into a DB
             position_record.insert(&db_conn).map_err(Error::from)
-                // After successful insertion, send and empty JSON responce
+                // After successful insertion, send an empty JSON responce
                 .and_then(|_| box ok(Response::new().with_body("{}")))
                 // Or log the error and send ErrorResponce
                 .or_else(|e| {
