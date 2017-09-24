@@ -1,4 +1,4 @@
-#![feature(conservative_impl_trait)] 
+#![feature(conservative_impl_trait, box_syntax)] 
 
 #[macro_use]
 extern crate diesel_codegen;
@@ -24,8 +24,7 @@ extern crate base64;
 #[macro_use]
 extern crate error_chain;
 
-extern crate hyper_common;
-
 pub mod db;
 pub mod firebase;
 pub mod proto;
+pub mod http;

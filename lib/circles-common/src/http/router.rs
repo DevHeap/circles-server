@@ -11,11 +11,11 @@ use std::rc::Rc;
 use std::io;
 use std::hash::Hash;
 
-use ::error::ErrorKind;
+use http::error::ErrorKind;
 
 use hyper::Method;
-use hyper_common::header::UserID;
-use hyper_common::ErrorResponse;
+use http::header::UserID;
+use http::ErrorResponse;
 
 /// Route handler return type
 pub type FutureRoute = Box<Future<Item=Response, Error=hyper::Error>>;
