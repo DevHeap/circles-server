@@ -1,13 +1,10 @@
 #[macro_use]
-pub mod router;
+pub mod service;
 pub mod error;
 pub mod header;
 pub mod error_response;
-pub mod auth;
 
 pub use self::error_response::ErrorResponse;
-
-pub use self::auth::Authenticator;
 
 use futures::Future;
 use hyper;
