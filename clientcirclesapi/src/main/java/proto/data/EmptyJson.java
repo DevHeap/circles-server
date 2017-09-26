@@ -1,6 +1,6 @@
 package proto.data;
 
-public class EmptyResponse {
+public class EmptyJson {
     @Override
     public String toString() {
         return "{}";
