@@ -24,6 +24,7 @@ use circles_common::http;
 
 use futures::Stream;
 use http::service::Authenticator;
+use http::service::Health;
 
 use hyper::server::Http;
 use hyper::server::NewService;
@@ -82,6 +83,7 @@ fn main() {
     // Router to dispatch requests for concrete pathes to their handlers
     let router = router!(
         post_positions: Method::Post, "/positions" => Rc::new(PositionsPostHandler::new(pgpool.clone())),
+        health: Method::Get, "/health" => Rc::new(Health),
     );
 
     // Authenticator for firebase token verification and user info population in the database
