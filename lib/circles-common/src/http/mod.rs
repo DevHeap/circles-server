@@ -4,8 +4,8 @@ pub mod error;
 pub mod header;
 pub mod response;
 
-pub use self::response::ServerResponse;
 pub use self::response::ApiError;
+pub use self::response::ServerResponse;
 
 use futures::Future;
 use hyper;

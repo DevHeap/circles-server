@@ -14,6 +14,7 @@ macro_rules! router {
         use http::ServerResponse;
         use http::error::ErrorKind;
         use futures::future::ok;
+        
         use std::rc::Rc;
         use std::io;
 
@@ -65,10 +66,10 @@ macro_rules! router {
     }}
 }
 
-use hyper;
-use hyper::server::Service;
-use hyper::{Request, Response};
 use http::FutureHandled;
+use hyper;
+use hyper::{Request, Response};
+use hyper::server::Service;
 
 // Until i write tests for reuter
 // @TODO write tests

@@ -1,28 +1,28 @@
 //! Request authentication proxy middleware
 
+use db::AsyncPgPool;
+use firebase::AsyncTokenVerifier;
+
+use firebase::Token;
+use futures::Future;
+use futures::future;
+use http::ApiError;
+
+use http::FutureHandled;
+use http::HandlerFactory;
+use http::ServerResponse;
+use http::error::Error;
+use http::error::ErrorKind;
+use http::header::UserID;
+
+use hyper;
 use hyper::{Request, Response};
 use hyper::header::{Authorization, Bearer};
 use hyper::server::{Service, NewService};
-use hyper;
-use futures::future;
-use futures::Future;
-use std::rc::Rc;
+
 use std::collections::HashMap;
 use std::io;
-
-use firebase::Token;
-use firebase::AsyncTokenVerifier;
-
-use http::HandlerFactory;
-use http::FutureHandled;
-use http::header::UserID;
-use http::ServerResponse;
-use http::ApiError;
-
-use http::error::ErrorKind;
-use http::error::Error;
-
-use db::AsyncPgPool;
+use std::rc::Rc;
 
 /// Authenticator Service factory with "persistent" state
 ///
@@ -137,8 +137,8 @@ impl Service for AuthenticatorService {
     }
 }
 
-use std::cell::RefCell;
 use chrono::NaiveDateTime;
+use std::cell::RefCell;
 
 // Cached updater preventing unneeded sql request flood
 struct UsersDbUpdater {

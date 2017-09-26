@@ -1,11 +1,13 @@
 //! Convenience traits for easy querying
 
 use db::AsyncPgPool;
-use futures_cpupool::CpuFuture;
 use db::error::Error;
 use db::models::*;
+
 use diesel;
 use diesel::ExecuteDsl;
+
+use futures_cpupool::CpuFuture;
 
 /// Convenient trait to simplify object insertion
 pub trait Insert {
