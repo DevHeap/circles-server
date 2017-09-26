@@ -1,13 +1,14 @@
 //! JWT IDToken decoding and verigication
 //! @TODO: tests
 
-use jwt;
-use jwt::id_token::IDToken;
 use base64;
+use firebase::{Result, ErrorKind};
+use firebase::keyring::Keyring;
+
 use json;
 
-use firebase::keyring::Keyring;
-use firebase::{Result, ErrorKind};
+use jwt;
+use jwt::id_token::IDToken;
 
 use std::ops::Deref;
 

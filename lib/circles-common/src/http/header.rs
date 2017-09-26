@@ -1,11 +1,12 @@
 //! Custom Hyper headers
 
+use hyper;
 use hyper::header::Header;
 use hyper::header::Raw;
-use hyper;
+
 use std::fmt;
-use std::str;
 use std::ops::Deref;
+use std::str;
 
 /// Header to pass ID of an authorized user throughout our services
 #[derive(Debug, Clone, Eq, PartialEq)]

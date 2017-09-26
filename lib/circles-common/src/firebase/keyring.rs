@@ -1,22 +1,21 @@
 
 //! Token Verifiers built with Google Keyring
 
-use std::collections::BTreeMap;
-use std::io::Read;
-use std::borrow::Cow;
-use std::time::{Duration, SystemTime, UNIX_EPOCH};
-use std::sync::{Arc, RwLock};
-use std::thread;
-
-use openssl::x509::X509;
+use firebase::{Result, Error, ErrorKind};
+use firebase::Token;
 
 use json;
-
+use jwt::id_token::IDTokenDecoder;
+use openssl::x509::X509;
 use reqwest;
 use reqwest::StatusCode;
-use firebase::Token;
-use firebase::{Result, Error, ErrorKind};
-use jwt::id_token::IDTokenDecoder;
+
+use std::borrow::Cow;
+use std::collections::BTreeMap;
+use std::io::Read;
+use std::sync::{Arc, RwLock};
+use std::thread;
+use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
 static GOOGLE_APIS_SECURE_TOKEN_URI: &str = "https://www.googleapis.com/robot/v1/metadata/x509/securetoken@system.gserviceaccount.com";
 
@@ -168,8 +167,8 @@ impl TokenVerifier {
     }
 }
 
-use futures_cpupool::CpuPool;
 use futures::Future;
+use futures_cpupool::CpuPool;
 
 /// CpuPool driven token authentifier
 pub struct AsyncTokenVerifier {

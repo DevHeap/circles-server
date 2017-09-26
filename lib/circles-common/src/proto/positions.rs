@@ -1,7 +1,7 @@
 //! JSON proto models for the /positions api
 
-use db::models::PositionRecord;
 use chrono::NaiveDateTime;
+use db::models::PositionRecord;
 
 /// JSON model for position update from user
 #[derive(Debug, Deserialize)]

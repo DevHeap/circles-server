@@ -1,11 +1,13 @@
 //! Database connection pool
 
-use diesel::pg::PgConnection;
-use r2d2_diesel::ConnectionManager;
-use r2d2::{Pool, PooledConnection};
-use r2d2;
-use db::Result;
 use db::Error;
+use db::Result;
+
+use diesel::pg::PgConnection;
+
+use r2d2;
+use r2d2::{Pool, PooledConnection};
+use r2d2_diesel::ConnectionManager;
 
 /// Synchronous PgConnection pool
 pub type SyncPgPool = Pool<ConnectionManager<PgConnection>>;
@@ -29,8 +31,8 @@ pub struct AsyncPgPool {
 use futures::Future;
 use futures::future::IntoFuture;
 use futures::future::result;
-use futures_cpupool::CpuPool;
 use futures_cpupool::CpuFuture;
+use futures_cpupool::CpuPool;
 
 impl AsyncPgPool {
     /// Construct AsyncPgPool from SyncPgPool

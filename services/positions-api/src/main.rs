@@ -18,21 +18,24 @@ extern crate serde_json as json;
 extern crate circles_common;
 
 mod positions;
-use positions::post::PositionsPostHandler;
-
-use hyper::server::Http;
-use hyper::server::NewService;
-use tokio_core::reactor;
-use tokio_core::net::TcpListener;
-use futures::Stream;
 
 use circles_common::db::AsyncPgPool;
 use circles_common::http;
+
+use futures::Stream;
 use http::service::Authenticator;
 
+use hyper::server::Http;
+use hyper::server::NewService;
+
 use std::rc::Rc;
-use std::thread;
 use std::sync::mpsc::channel;
+use std::thread;
+
+use tokio_core::net::TcpListener;
+use tokio_core::reactor;
+
+use positions::post::PositionsPostHandler;
 
 // @TODO move to a shared library, implement log.toml config file
 fn init_logger() -> Result<(), log::SetLoggerError> {
@@ -52,10 +55,10 @@ fn init_logger() -> Result<(), log::SetLoggerError> {
             ))
         })
         .level(log::LogLevelFilter::Warn)
-        .level_for("positions_api",  log::LogLevelFilter::Trace)
+        .level_for("positions_api", log::LogLevelFilter::Trace)
         .level_for("circles_router", log::LogLevelFilter::Trace)
         .level_for("circles_common", log::LogLevelFilter::Trace)
-        .level_for("hyper_common",   log::LogLevelFilter::Trace)
+        .level_for("hyper_common", log::LogLevelFilter::Trace)
         .chain(tx)
         .apply()?;
     Ok(())

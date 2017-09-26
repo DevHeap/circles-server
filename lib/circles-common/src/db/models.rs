@@ -1,12 +1,12 @@
 
 //! Data types reflecting actual database tables schema
 
-use db::schema::*;
 use chrono::NaiveDateTime;
+use db::schema::*;
 use firebase::Token;
 
 /// User model for the "users" table
-#[derive(Queryable, Identifiable, Insertable)]
+#[derive(Debug, Queryable, Identifiable, Insertable)]
 #[table_name = "users"]
 #[primary_key(uid)]
 pub struct User {
@@ -25,7 +25,7 @@ pub struct User {
 }
 
 /// Auth data changeset: issue time and expiration time
-#[derive(AsChangeset)]
+#[derive(Debug, Copy, Clone, AsChangeset)]
 #[table_name = "users"]
 pub struct UserAuthData {
     /// Firebase token issue time (basically an authentication time)
@@ -64,7 +64,7 @@ impl User {
 }
 
 /// PositionResord model for the "users" table
-#[derive(Queryable, Identifiable, Insertable)]
+#[derive(Debug, Queryable, Identifiable, Insertable)]
 #[table_name = "position_records"]
 #[primary_key(time, user_uid)]
 pub struct PositionRecord {

@@ -3,3 +3,44 @@ members = [
     "lib/circles-common",
     "services/positions-api"
 ]
+
+# The development profile, used for `cargo build`.
+[profile.dev]
+opt-level = 0
+debug = true 
+lto = false
+debug-assertions = true 
+codegen-units = 2
+
+# The testing profile, used for `cargo test`.
+[profile.test]
+opt-level = 0
+debug = true
+lto = false
+debug-assertions = true
+codegen-units = 1
+
+# The release profile, used for `cargo build --release`.
+[profile.release]
+opt-level = 3
+debug = false
+lto = true
+debug-assertions = false
+codegen-units = 1
+panic = 'unwind'
+
+# The benchmarking profile, used for `cargo bench`.
+[profile.bench]
+opt-level = 3
+debug = false
+lto = true
+debug-assertions = false
+codegen-units = 1
+
+# The documentation profile, used for `cargo doc`.
+[profile.doc]
+opt-level = 0
+debug = true
+lto = false
+debug-assertions = true
+codegen-units = 1

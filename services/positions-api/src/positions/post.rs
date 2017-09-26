@@ -1,23 +1,23 @@
-use std::rc::Rc;
+use circles_common::db::AsyncPgPool;
+use circles_common::db::query::*;
+use circles_common::http;
+use circles_common::http::FutureHandled;
+use circles_common::http::ServerResponse;
+use circles_common::http::header::UserID;
+use circles_common::proto::positions::PositionUpdate;
+
+use futures::{Future, Stream};
+use futures::future::ok;
 
 use hyper;
 use hyper::{Method, Request, Response};
 use hyper::server::Service;
 
-use futures::{Future, Stream};
-use futures::future::ok;
-
 use json;
 
-use circles_common::db::AsyncPgPool;
-use circles_common::db::query::*;
-use circles_common::proto::positions::PositionUpdate;
-use circles_common::http::FutureHandled;
-use circles_common::http::header::UserID;
-use circles_common::http::ServerResponse;
-use circles_common::http;
-
 use positions::error::Error;
+
+use std::rc::Rc;
 
 pub struct PositionsPostHandler {
     db_conn: Rc<AsyncPgPool>,

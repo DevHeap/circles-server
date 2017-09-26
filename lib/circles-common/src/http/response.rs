@@ -1,14 +1,15 @@
 //! Server Response with an error message
 
-use std::fmt;
-use std::fmt::Display;
-use std::error::Error;
 
 use hyper::Response;
 use hyper::StatusCode;
 
-use serde::Serialize;
 use json;
+use serde::Serialize;
+
+use std::error::Error;
+use std::fmt;
+use std::fmt::Display;
 
 /// Generic Server Response
 ///

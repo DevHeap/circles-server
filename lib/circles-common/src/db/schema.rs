@@ -1,5 +1,4 @@
-#![allow(non_snake_case)]
-#![allow(missing_docs)]
+#![allow(non_snake_case, missing_docs, unused_qualifications)]
 
 //! Diesel generated schema and tables access DSL
 
