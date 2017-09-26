@@ -1,7 +1,14 @@
-sudo: false
+matrix:
+  include:
+    - language: rust
+      cache: cargo
+      rust: nightly
+      script:
+        - cargo test
 
-language: rust
-cache: cargo
-
-rust:
-  - nightly
+    - language: java
+      jdk: oraclejdk8
+      before_script:
+        - cd clientcirclesapi/
+      script:
+        - mvn test -B
