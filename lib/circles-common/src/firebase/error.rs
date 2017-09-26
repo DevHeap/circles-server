@@ -2,7 +2,7 @@
 #![allow(missing_docs)]
 
 use hyper::StatusCode;
-use http::ErrorResponse;
+use http::ApiError;
 
 // Generate error types boilerplate
 
@@ -38,19 +38,19 @@ error_chain! {
 }
 
 /// This function converts ErrorKind and &ErrorKind to an ErrorResponse
-impl From<Error> for ErrorResponse {
+impl From<Error> for ApiError {
     fn from(e: Error) -> Self {
-        ErrorResponse::from(e.kind())
+        ApiError::from(e.kind())
     }
 }
 
-impl From<ErrorKind> for ErrorResponse {
+impl From<ErrorKind> for ApiError {
     fn from(ek: ErrorKind) -> Self {
-        ErrorResponse::from(&ek)
+        ApiError::from(&ek)
     }
 }
 
-impl<'a> From<&'a ErrorKind> for ErrorResponse {
+impl<'a> From<&'a ErrorKind> for ApiError {
     fn from(ek: &'a ErrorKind) -> Self {
         use firebase::ErrorKind::*;
         match *ek {
@@ -60,8 +60,8 @@ impl<'a> From<&'a ErrorKind> for ErrorResponse {
             OpenSSL(..) |
             OpenSSLStack(..) |
             Reqwest(..) |
-            Msg(..) => ErrorResponse::with_status(&ek, StatusCode::InternalServerError),
-            _ => ErrorResponse::with_status(&ek, StatusCode::Unauthorized),
+            Msg(..) => ApiError::with_status(&ek, StatusCode::InternalServerError),
+            _ => ApiError::with_status(&ek, StatusCode::Unauthorized),
         }
     }
 }

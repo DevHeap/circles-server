@@ -27,7 +27,8 @@ use tokio_core::net::TcpListener;
 use futures::Stream;
 
 use circles_common::db::AsyncPgPool;
-use circles_common::http::Authenticator;
+use circles_common::http;
+use http::service::Authenticator;
 
 use std::rc::Rc;
 use std::thread;
@@ -51,7 +52,7 @@ fn init_logger() -> Result<(), log::SetLoggerError> {
             ))
         })
         .level(log::LogLevelFilter::Warn)
-        .level_for("positions-api",  log::LogLevelFilter::Trace)
+        .level_for("positions_api",  log::LogLevelFilter::Trace)
         .level_for("circles_router", log::LogLevelFilter::Trace)
         .level_for("circles_common", log::LogLevelFilter::Trace)
         .level_for("hyper_common",   log::LogLevelFilter::Trace)

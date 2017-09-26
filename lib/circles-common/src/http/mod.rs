@@ -2,9 +2,10 @@
 pub mod service;
 pub mod error;
 pub mod header;
-pub mod error_response;
+pub mod response;
 
-pub use self::error_response::ErrorResponse;
+pub use self::response::ServerResponse;
+pub use self::response::ApiError;
 
 use futures::Future;
 use hyper;

@@ -4,7 +4,7 @@
 
 use hyper::StatusCode;
 use hyper::Method;
-use http::ErrorResponse;
+use http::ApiError;
 
 error_chain!{
     links {
@@ -30,27 +30,25 @@ error_chain!{
     }
 }
 
-impl From<Error> for ErrorResponse {
+impl From<Error> for ApiError {
     fn from(e: Error) -> Self {
         match *e.kind() {
-            ErrorKind::Firebase(ref e) => ErrorResponse::from(e),
+            ErrorKind::Firebase(ref e) => ApiError::from(e),
             ErrorKind::Database(ref e) => {
-                ErrorResponse::with_status(&e, StatusCode::InternalServerError)
+                ApiError::with_status(&e, StatusCode::InternalServerError)
             }
-            ErrorKind::AuthHeaderMissing => {
-                ErrorResponse::with_status(&e, StatusCode::Unauthorized)
-            }
-            ErrorKind::PathNotFound(..) => ErrorResponse::with_status(&e, StatusCode::NotFound),
+            ErrorKind::AuthHeaderMissing => ApiError::with_status(&e, StatusCode::Unauthorized),
+            ErrorKind::PathNotFound(..) => ApiError::with_status(&e, StatusCode::NotFound),
             ErrorKind::MissingUserIDHeader => {
-                ErrorResponse::with_status(&e, StatusCode::InternalServerError)
+                ApiError::with_status(&e, StatusCode::InternalServerError)
             }
-            ErrorKind::Msg(..) => ErrorResponse::with_status(&e, StatusCode::InternalServerError),
+            ErrorKind::Msg(..) => ApiError::with_status(&e, StatusCode::InternalServerError),
         }
     }
 }
 
-impl From<ErrorKind> for ErrorResponse {
+impl From<ErrorKind> for ApiError {
     fn from(ek: ErrorKind) -> Self {
-        ErrorResponse::from(Error::from(ek))
+        ApiError::from(Error::from(ek))
     }
 }

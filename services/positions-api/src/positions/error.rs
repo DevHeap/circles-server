@@ -1,6 +1,6 @@
 #![allow(unused_doc_comment)]
 
-use circles_common::http::ErrorResponse;
+use circles_common::http::ApiError;
 use hyper::StatusCode;
 
 error_chain!{
@@ -16,19 +16,19 @@ error_chain!{
 }
 
 
-impl From<Error> for ErrorResponse {
+impl From<Error> for ApiError {
     fn from(e: Error) -> Self {
         Self::from(e.kind())
     }
 }
 
-impl From<ErrorKind> for ErrorResponse {
+impl From<ErrorKind> for ApiError {
     fn from(ek: ErrorKind) -> Self {
         Self::from(&ek)
     }
 }
 
-impl<'a> From<&'a ErrorKind> for ErrorResponse {
+impl<'a> From<&'a ErrorKind> for ApiError {
     fn from(ek: &'a ErrorKind) -> Self {
         use positions::error::ErrorKind::*;
         match *ek {
