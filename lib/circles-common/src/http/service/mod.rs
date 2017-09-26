@@ -1,4 +1,4 @@
-//! Ready-to-use Hyper Services 
+//! Ready-to-use Hyper Services
 
 #[macro_use]
 mod router;

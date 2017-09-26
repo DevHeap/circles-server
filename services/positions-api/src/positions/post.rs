@@ -14,7 +14,7 @@ use circles_common::db::query::*;
 use circles_common::proto::positions::PositionUpdate;
 use circles_common::http::FutureHandled;
 use circles_common::http::header::UserID;
-use circles_common::http::ErrorResponse;
+use circles_common::http::ServerResponse;
 use circles_common::http;
 
 use positions::error::Error;
@@ -43,7 +43,7 @@ impl Service for PositionsPostHandler {
             Some(user_id) => user_id.0,
             None => {
                 return box ok(
-                    ErrorResponse::from(http::error::ErrorKind::MissingUserIDHeader).into(),
+                    ServerResponse::from(http::error::ErrorKind::MissingUserIDHeader).into(),
                 )
             }
         };
@@ -64,6 +64,8 @@ impl Service for PositionsPostHandler {
                 // Convert to a valid utf8 string
                 String::from_utf8(body).map_err(Error::from).and_then(
                     |json_str| {
+                        // Log received data
+                        trace!("received a PositionUpdate: {:?}", json_str);
                         // Parse the body json into PositionUpdate
                         json::from_str::<PositionUpdate>(&json_str).map_err(Error::from)
                     },
@@ -84,10 +86,10 @@ impl Service for PositionsPostHandler {
                 // Or log the error and send ErrorResponce
                 .or_else(|e| {
                     error!("{}", e);
-                    box ok(ErrorResponse::from(e).into())
+                    box ok(ServerResponse::from(e).into())
                 })
         })
         // Send client request's decoding error 
-            .or_else(|e| box ok(ErrorResponse::from(e).into()))
+            .or_else(|e| box ok(ServerResponse::from(e).into()))
     }
 }

@@ -16,7 +16,8 @@ use firebase::AsyncTokenVerifier;
 use http::HandlerFactory;
 use http::FutureHandled;
 use http::header::UserID;
-use http::ErrorResponse;
+use http::ServerResponse;
+use http::ApiError;
 
 use http::error::ErrorKind;
 use http::error::Error;
@@ -70,9 +71,9 @@ pub struct AuthenticatorService {
 }
 
 impl AuthenticatorService {
-    fn extract_token(req: &Request) -> Result<&str, ErrorResponse> {
+    fn extract_token(req: &Request) -> Result<&str, ApiError> {
         let headers = req.headers();
-        let bearer: &Authorization<Bearer> = headers.get().ok_or(ErrorResponse::from(
+        let bearer: &Authorization<Bearer> = headers.get().ok_or(ApiError::from(
             ErrorKind::AuthHeaderMissing,
         ))?;
 
@@ -88,11 +89,12 @@ impl Service for AuthenticatorService {
 
     fn call(&self, mut req: Request) -> Self::Future {
         trace!("accepted {} request for {}", req.method(), req.uri());
+        trace!("headers: {:?}", req.headers());
 
         // Extract IDToken from headers
         let token = match Self::extract_token(&req) {
             Ok(token) => token.to_owned(),
-            Err(error) => return box future::ok(error.into()),
+            Err(error) => return box future::ok(ServerResponse::from(error).into()),
         };
 
         let next_chain = self.next_chain.new_service()
@@ -116,7 +118,7 @@ impl Service for AuthenticatorService {
                         let db_future = users_db.update_if_needed(&token).then(
                             move |res| match res {
                                 Ok(..) => next_chain.call(req),
-                                Err(e) => box future::ok(ErrorResponse::from(e).into()),
+                                Err(e) => box future::ok(ServerResponse::from(e).into()),
                             },
                         );
 
@@ -125,7 +127,7 @@ impl Service for AuthenticatorService {
                     }
                     Err(e) => {
                         debug!("attempted unathorized access to {}", req.path());
-                        box future::ok(ErrorResponse::from(e).into())
+                        box future::ok(ServerResponse::from(e).into())
                     }
                 }
             },

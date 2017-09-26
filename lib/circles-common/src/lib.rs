@@ -1,4 +1,4 @@
-#![feature(conservative_impl_trait, box_syntax)]
+#![feature(conservative_impl_trait, box_syntax, specialization)]
 #![deny(missing_docs)]
 
 //! Crate of the common building blocks for the Circles microservices
@@ -14,6 +14,7 @@ extern crate diesel_codegen;
 extern crate diesel;
 #[macro_use]
 extern crate serde_derive;
+extern crate serde;
 extern crate serde_json as json;
 extern crate chrono;
 extern crate r2d2;

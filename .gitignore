@@ -1,4 +1,5 @@
 **/target/
+**/.idea/
 graylog/config/node-id
 graylog/data
 .env
