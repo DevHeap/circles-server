@@ -6,7 +6,7 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import proto.data.error.ApiError;
-import proto.data.EmptyResponse;
+import proto.data.EmptyJson;
 import proto.data.positions.PositionUpdate;
 import retrofit2.Response;
 
@@ -46,7 +46,7 @@ public class CirclesApiTest {
         CirclesApi api = new ServiceGenerator(HttpUrl.parse("http://localhost/"), "wrong token", HttpLoggingInterceptor.Level.BASIC)
                 .makeService();
 
-        Response<EmptyResponse> response = api.updatePosition(new PositionUpdate()).execute();
+        Response<EmptyJson> response = api.updatePosition(new PositionUpdate()).execute();
         printResponse(response);
 
         assertFalse(response.isSuccess());
@@ -63,7 +63,7 @@ public class CirclesApiTest {
         positionUpdate.setLatitude(55.751716);
         positionUpdate.setLongitude(48.74731);
 
-        Response<EmptyResponse> response = api.updatePosition(positionUpdate).execute();
+        Response<EmptyJson> response = api.updatePosition(positionUpdate).execute();
         printResponse(response);
 
         assertTrue(response.isSuccess());
