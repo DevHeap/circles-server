@@ -31,7 +31,7 @@ extern crate log;
 extern crate hyper;
 extern crate reqwest;
 extern crate openssl;
-extern crate rusty_jwt as jwt;
+extern crate rustwt as jwt;
 extern crate base64;
 
 #[macro_use]
