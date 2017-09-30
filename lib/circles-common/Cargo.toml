@@ -25,5 +25,5 @@ git = "https://github.com/DevHeap/hyper"
 [dependencies.reqwest]
 git = "https://github.com/DevHeap/reqwest"
 
-[dependencies.rusty_jwt]
-git = "https://github.com/DevHeap/rusty_jwt"
+[dependencies.rustwt]
+git = "https://github.com/Richterrettich/rustwt"
