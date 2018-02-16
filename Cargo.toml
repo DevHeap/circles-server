@@ -10,7 +10,7 @@ opt-level = 0
 debug = true 
 lto = false
 debug-assertions = true 
-codegen-units = 2
+codegen-units = 16
 
 # The testing profile, used for `cargo test`.
 [profile.test]
